@@ -1,0 +1,11 @@
+spring:
+  application:
+    name:
+      yabam
+  config:
+    activate:
+      on-profile: local
+    import: configserver:http://localhost:8087
+
+
+---

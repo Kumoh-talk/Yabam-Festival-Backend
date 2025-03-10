@@ -1,0 +1,8 @@
+rootProject.name = 'yabam'
+
+include(':application:yabam')
+
+
+include(':application:config')
+include(':application:discovery')
+include(':application:gateway')
