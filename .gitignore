@@ -37,3 +37,6 @@ out/
 .vscode/
 
 *.sock
+
+
+/application/config/src/main/resources/config-server.properties

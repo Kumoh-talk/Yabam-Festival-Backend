@@ -9,7 +9,7 @@ services:
     environment:
       MYSQL_DATABASE: local_mydb
       MYSQL_CHARSET: utf8mb4
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: 1234
       MYSQL_COLLATION: utf8mb4_unicode_ci
     volumes:
       - ./data/:/var/lib/mysql

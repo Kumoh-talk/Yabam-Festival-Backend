@@ -16,6 +16,8 @@ configurations {
 	}
 }
 
+
+
 allprojects {
 	ext {
 		set('springCloudVersion', "2024.0.0")
@@ -27,11 +29,17 @@ allprojects {
 	repositories {
 		mavenCentral()
 	}
+
+
+
 }
+
+
 subprojects {
 
 
 	apply plugin: 'java'
+	apply plugin: 'java-library'
 	apply plugin: 'org.springframework.boot'
 	apply plugin: 'io.spring.dependency-management'
 
@@ -49,4 +57,22 @@ subprojects {
 		}
 	}
 
+	// submodule 설정 필요한 모듈에 전이
+	if (project.name == "config") {
+		tasks.register('copyPrivate', Copy) {
+			from "$rootDir/cloud-config-private"
+			include "config-server.properties"
+			into "$projectDir/src/main/resources"
+		}
+
+		tasks.named('processResources') {
+			dependsOn tasks.named('copyPrivate')
+		}
+	}
+}
+// submodule 에서 민감정보 이동
+tasks.register('copyPrivate', Copy) {
+	from 'cloud-config-private'
+	include "config-server.properties"
+	into 'application/config/src/main/resources'
 }

@@ -6,3 +6,6 @@ include(':application:yabam')
 include(':application:config')
 include(':application:discovery')
 include(':application:gateway')
+
+// common
+include(":common:discovery-client")

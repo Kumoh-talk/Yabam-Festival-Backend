@@ -5,3 +5,8 @@ jar{
     enabled = false
 }
 
+dependencies {
+    // eureka server
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
+}
+

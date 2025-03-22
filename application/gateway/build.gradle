@@ -4,3 +4,14 @@ bootJar{
 jar{
     enabled = false
 }
+
+dependencies {
+    // spring cloud gateway
+    implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
+
+    // discovery client module
+    implementation project(':common:discovery-client')
+
+    // spring cloud config
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+}
