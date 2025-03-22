@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${GIT_URL}
+          host-key: ${GIT_HOST_KEY}
+          host-key-algorithm: ${GIT_HOST_KEY_ALGORITHM}
+          default-label: main
+          ignore-local-ssh-settings: true
+          private-key: ${GIT_PRIVATE_KEY}
+          passphrase: ${GIT_PASSPHRASE}
+  config:
+    import:
+      - config-server.properties
+server:
+  port: 8087
