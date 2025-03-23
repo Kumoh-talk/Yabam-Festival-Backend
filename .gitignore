@@ -39,4 +39,8 @@ out/
 *.sock
 
 
+# config server 보안 프로퍼티
 /application/config/src/main/resources/config-server.properties
+
+# application data
+/application/yabam/data
