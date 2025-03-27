@@ -15,9 +15,7 @@ dependencies {
     // web
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    // lombok
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+
 
     // config client
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
@@ -28,4 +26,10 @@ dependencies {
 
     // discovery client module
     implementation(project(':common:discovery-client'))
+
+    // common
+    implementation(project(':common:base'))
+
+    // Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
 }

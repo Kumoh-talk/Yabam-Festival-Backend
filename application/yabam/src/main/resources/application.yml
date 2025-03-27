@@ -7,6 +7,9 @@ spring:
       on-profile: local
     import: configserver:http://localhost:8087
 
+swagger:
+  server-url: http://localhost:8072 # gateway 주소
+  description: "local 백엔드 서버"
 ---
 
 spring:

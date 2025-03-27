@@ -9,3 +9,4 @@ include(':application:gateway')
 
 // common
 include(":common:discovery-client")
+include(":common:base")
