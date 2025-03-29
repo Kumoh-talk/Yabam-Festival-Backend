@@ -6,8 +6,8 @@ import lombok.Getter;
 
 @Getter
 public enum ErrorCode {
-	// TODO : 곧 삭제 될 예정
-	TEST_ERROR(HttpStatus.BAD_GATEWAY, "TEST_0001", "멀티 모듈 환경에서 에러 핸들링 테스트");
+	// Owner
+	NOT_VALID_OWNER(HttpStatus.BAD_REQUEST, "OWNER_0001", "해당 사용자는 가게 점주가 아닙니다");
 
 	private final HttpStatus status;
 	private final String code;

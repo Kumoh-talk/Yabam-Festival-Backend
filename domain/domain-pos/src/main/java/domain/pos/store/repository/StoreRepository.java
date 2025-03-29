@@ -1,4 +1,8 @@
 package domain.pos.store.repository;
 
-public class StoreRepository {
+import domain.pos.member.entity.Owner;
+import domain.pos.store.entity.Store;
+
+public interface StoreRepository {
+	Long createStore(Owner owner, Store createRequestStore);
 }
