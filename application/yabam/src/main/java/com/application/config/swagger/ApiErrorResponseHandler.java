@@ -59,7 +59,8 @@ public class ApiErrorResponseHandler {
 	private Example createSwaggerExample(ErrorCode errorCode, String description) {
 		FailedResponseBody failedResponseBody
 			= new FailedResponseBody(errorCode.getCode(), errorCode.getMessage());
-		ExampleFailedResponseBody failedResponseBodyExample = new ExampleFailedResponseBody("false", failedResponseBody);
+		ExampleFailedResponseBody failedResponseBodyExample =
+			new ExampleFailedResponseBody("false", failedResponseBody);
 
 		Example example = new Example();
 		example.setValue(failedResponseBodyExample);
@@ -99,11 +100,11 @@ public class ApiErrorResponseHandler {
 
 	@Getter
 	public static class ExampleFailedResponseBody {
-		private  final String success;
-		private  final String code;
-		private  final String message;
+		private final String success;
+		private final String code;
+		private final String message;
 
-		public ExampleFailedResponseBody(String success , FailedResponseBody failedResponseBody) {
+		public ExampleFailedResponseBody(String success, FailedResponseBody failedResponseBody) {
 			this.success = success;
 			this.code = failedResponseBody.getCode();
 			this.message = failedResponseBody.getMsg();

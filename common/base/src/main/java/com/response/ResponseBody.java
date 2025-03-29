@@ -13,16 +13,16 @@ import lombok.Setter;
 @Setter
 @Getter
 @JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
-        property = "success")
+	use = JsonTypeInfo.Id.NAME,
+	include = JsonTypeInfo.As.PROPERTY,
+	property = "success")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = SuccessResponseBody.class, name = "true"),
-        @JsonSubTypes.Type(value = FailedResponseBody.class, name = "false")
+	@JsonSubTypes.Type(value = SuccessResponseBody.class, name = "true"),
+	@JsonSubTypes.Type(value = FailedResponseBody.class, name = "false")
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public sealed abstract class ResponseBody<T> permits SuccessResponseBody, FailedResponseBody {
-    private String code;
+public abstract sealed class ResponseBody<T> permits SuccessResponseBody, FailedResponseBody {
+	private String code;
 }

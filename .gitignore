@@ -44,3 +44,9 @@ out/
 
 # application data
 /application/yabam/data
+
+
+### Conventional Commit ###
+/node_modules
+
+

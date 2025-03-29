@@ -19,8 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 @Hidden
 public class GlobalExceptionHandler {
 	@ExceptionHandler(ServiceException.class) // custom 에러
-	public ResponseEntity<ResponseBody<Void>> handleServiceException(HttpServletRequest request, ServiceException e) {
-		ErrorCode errorCode = e.getErrorCode();
+	public ResponseEntity<ResponseBody<Void>> handleServiceException(HttpServletRequest request,
+		ServiceException exception) {
+		ErrorCode errorCode = exception.getErrorCode();
 		return ResponseEntity.status(errorCode.getStatus())
 			.body(createFailureResponse(errorCode));
 	}

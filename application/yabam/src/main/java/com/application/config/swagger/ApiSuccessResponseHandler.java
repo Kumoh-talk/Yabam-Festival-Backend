@@ -1,6 +1,5 @@
 package com.application.config.swagger;
 
-
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
