@@ -7,10 +7,8 @@ import static org.mockito.Mockito.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.exception.ErrorCode;
 import com.exception.ServiceException;
@@ -23,7 +21,6 @@ import domain.pos.store.entity.StoreInfo;
 import domain.pos.store.implement.StoreReader;
 import domain.pos.store.implement.StoreWriter;
 
-@ExtendWith(MockitoExtension.class)
 class StoreServiceTest extends ServiceTest {
 
 	@Mock
