@@ -1,15 +1,23 @@
-bootJar{
+bootJar {
     enabled = false
 }
 
-jar{
+jar {
     enabled = true
 }
 
 
 dependencies {
+    // spring compoment annotation
+    compileOnly 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // common exception
+    implementation project(":common:base")
 
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.springframework.boot:spring-boot-starter-web'
+
 }
