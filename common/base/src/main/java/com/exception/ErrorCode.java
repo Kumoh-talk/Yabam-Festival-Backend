@@ -6,8 +6,8 @@ import lombok.Getter;
 
 @Getter
 public enum ErrorCode {
-	TEST_ERROR(HttpStatus.BAD_GATEWAY, "TEST_0001","멀티 모듈 환경에서 에러 핸들링 테스트" ), // TODO : 곧 삭제 될 예정
-	;
+	// TODO : 곧 삭제 될 예정
+	TEST_ERROR(HttpStatus.BAD_GATEWAY, "TEST_0001", "멀티 모듈 환경에서 에러 핸들링 테스트");
 
 	private final HttpStatus status;
 	private final String code;

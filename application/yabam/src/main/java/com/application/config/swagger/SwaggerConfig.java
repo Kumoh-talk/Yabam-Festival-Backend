@@ -1,6 +1,5 @@
 package com.application.config.swagger;
 
-
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
