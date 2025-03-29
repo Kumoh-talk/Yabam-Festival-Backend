@@ -7,10 +7,8 @@ import static org.mockito.Mockito.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.exception.ErrorCode;
 import com.exception.ServiceException;
@@ -18,17 +16,21 @@ import com.exception.ServiceException;
 import base.ServiceTest;
 import domain.pos.member.entity.Owner;
 import domain.pos.member.implement.OwnerValidator;
+import domain.pos.store.entity.Store;
 import domain.pos.store.entity.StoreInfo;
+import domain.pos.store.implement.StoreReader;
 import domain.pos.store.implement.StoreWriter;
 
-@ExtendWith(MockitoExtension.class)
-class StoreInfoServiceTest extends ServiceTest {
+class StoreServiceTest extends ServiceTest {
 
 	@Mock
 	private OwnerValidator ownerValidator;
 
 	@Mock
 	private StoreWriter storeWriter;
+
+	@Mock
+	private StoreReader storeReader;
 
 	@InjectMocks
 	private StoreService storeService;
@@ -82,4 +84,28 @@ class StoreInfoServiceTest extends ServiceTest {
 		}
 	}
 
+	@Nested
+	@DisplayName("가게 단건 조회")
+	class singleSearchStore {
+		@Test
+		void 성공() {
+			// given
+			Long queryStoreId = GENERAL_STORE().getStoreId();
+			Store responseStore = GENERAL_STORE();
+
+			doReturn(responseStore)
+				.when(storeReader).readSingleStore(queryStoreId);
+
+			// when
+			Store savedStore = storeService.findStore(queryStoreId);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(responseStore).isEqualTo(savedStore);
+
+				verify(storeReader)
+					.readSingleStore(queryStoreId);
+			});
+		}
+	}
 }
