@@ -22,7 +22,7 @@ import domain.pos.store.entity.StoreInfo;
 import domain.pos.store.implement.StoreWriter;
 
 @ExtendWith(MockitoExtension.class)
-class StoreInfoServiceTest extends ServiceTest {
+class StoreServiceTest extends ServiceTest {
 
 	@Mock
 	private OwnerValidator ownerValidator;
