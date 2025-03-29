@@ -5,5 +5,5 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class Store {
+public class StoreInfo {
 }

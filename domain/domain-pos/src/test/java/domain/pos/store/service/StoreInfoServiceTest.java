@@ -18,11 +18,11 @@ import com.exception.ServiceException;
 import base.ServiceTest;
 import domain.pos.member.entity.Owner;
 import domain.pos.member.implement.OwnerValidator;
-import domain.pos.store.entity.Store;
+import domain.pos.store.entity.StoreInfo;
 import domain.pos.store.implement.StoreWriter;
 
 @ExtendWith(MockitoExtension.class)
-class StoreServiceTest extends ServiceTest {
+class StoreInfoServiceTest extends ServiceTest {
 
 	@Mock
 	private OwnerValidator ownerValidator;
@@ -35,20 +35,20 @@ class StoreServiceTest extends ServiceTest {
 
 	@Nested
 	@DisplayName("store 생성")
-	class createStore {
+	class createStoreInfo {
 		private static final Long SAVED_STORE_ID = 1L;
 
 		@Test
 		void 성공() {
 			// given
-			Store requestStore = CREATE_REQUEST_STORE();
+			StoreInfo requestStoreInfo = CREATE_REQUEST_STORE_INFO();
 			Owner owner = new Owner();
 
 			doReturn(SAVED_STORE_ID)
-				.when(storeWriter).createStore(owner, requestStore);
+				.when(storeWriter).createStore(owner, requestStoreInfo);
 
 			// when
-			Long storeId = storeService.createStore(owner, requestStore);
+			Long storeId = storeService.createStore(owner, requestStoreInfo);
 			// then
 			assertSoftly(softly -> {
 				softly.assertThat(storeId).isEqualTo(SAVED_STORE_ID);
@@ -56,14 +56,14 @@ class StoreServiceTest extends ServiceTest {
 				verify(ownerValidator)
 					.validateOwner(owner);
 				verify(storeWriter)
-					.createStore(owner, requestStore);
+					.createStore(owner, requestStoreInfo);
 			});
 		}
 
 		@Test
 		void 실패_점주_유효성검사() {
 			// given
-			Store requestStore = CREATE_REQUEST_STORE();
+			StoreInfo requestStoreInfo = CREATE_REQUEST_STORE_INFO();
 			Owner owner = new Owner();
 
 			doThrow(new ServiceException(ErrorCode.NOT_VALID_OWNER))
@@ -71,7 +71,7 @@ class StoreServiceTest extends ServiceTest {
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> storeService.createStore(owner, requestStore))
+				softly.assertThatThrownBy(() -> storeService.createStore(owner, requestStoreInfo))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_VALID_OWNER);
 				verify(ownerValidator)

@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import domain.pos.member.entity.Owner;
 import domain.pos.member.implement.OwnerValidator;
-import domain.pos.store.entity.Store;
+import domain.pos.store.entity.StoreInfo;
 import domain.pos.store.implement.StoreWriter;
 import lombok.RequiredArgsConstructor;
 
@@ -16,10 +16,10 @@ public class StoreService {
 	private final StoreWriter storeWriter;
 
 	@Transactional
-	public Long createStore(Owner owner, Store createRequestStore) {
+	public Long createStore(final Owner owner, final StoreInfo createRequestStoreInfo) {
 		ownerValidator.validateOwner(owner);
 
-		Long savedStoreId = storeWriter.createStore(owner, createRequestStore);
+		final Long savedStoreId = storeWriter.createStore(owner, createRequestStoreInfo);
 		return savedStoreId;
 	}
 }
