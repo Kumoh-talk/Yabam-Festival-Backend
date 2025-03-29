@@ -1,35 +1,35 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.4.3' apply(false)
-	id 'io.spring.dependency-management' version '1.1.7' apply(false)
+    id 'java'
+    id 'org.springframework.boot' version '3.4.3' apply(false)
+    id 'io.spring.dependency-management' version '1.1.7' apply(false)
+    id 'org.ec4j.editorconfig' version '0.0.2'
+    id 'checkstyle'
 }
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 
-
 allprojects {
-	ext {
-		set('springCloudVersion', "2024.0.0")
-	}
+    ext {
+        set('springCloudVersion', "2024.0.0")
+    }
 
-	group = 'com.application.festival'
-	version = '0.0.1-SNAPSHOT'
+    group = 'com.application.festival'
+    version = '0.0.1-SNAPSHOT'
 
-	repositories {
-		mavenCentral()
-	}
-
+    repositories {
+        mavenCentral()
+    }
 
 
 }
@@ -38,43 +38,97 @@ allprojects {
 subprojects {
 
 
-	apply plugin: 'java'
-	apply plugin: 'java-library'
-	apply plugin: 'org.springframework.boot'
-	apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'checkstyle'
 
-	dependencies {
-		// lombok
-		compileOnly 'org.projectlombok:lombok'
-		annotationProcessor 'org.projectlombok:lombok'
-	}
+    checkstyle {
+        toolVersion = "8.42"
+        configFile = rootProject.file("rule-config/naver-checkstyle-rules.xml") // ✅ 명시적으로 설정
+        configProperties = [
+                "suppressionFile": rootProject.file("rule-config/naver-checkstyle-suppressions.xml")
+        ]
+        sourceSets = [sourceSets.main]
+        maxWarnings = 0
+        ignoreFailures = false
+    }
 
-	tasks.named('test') {
-		useJUnitPlatform()
-	}
+    checkstyleMain {
+        source = fileTree('src/main/java')
+    }
 
-	dependencyManagement {
-		imports {
-			mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-		}
-	}
+    tasks.named('check') {
+        dependsOn 'checkstyleMain'
+    }
 
-	// submodule 설정 필요한 모듈에 전이
-	if (project.name == "config") {
-		tasks.register('copyPrivate', Copy) {
-			from "$rootDir/cloud-config-private"
-			include "config-server.properties"
-			into "$projectDir/src/main/resources"
-		}
+    dependencies {
+        // lombok
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+    }
 
-		tasks.named('processResources') {
-			dependsOn tasks.named('copyPrivate')
-		}
-	}
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+
+    // submodule 설정 필요한 모듈에 전이
+    if (project.name == "config") {
+        tasks.register('copyPrivate', Copy) {
+            from "$rootDir/cloud-config-private"
+            include "config-server.properties"
+            into "$projectDir/src/main/resources"
+        }
+
+        tasks.named('processResources') {
+            dependsOn tasks.named('copyPrivate')
+        }
+    }
 }
 // submodule 에서 민감정보 이동
 tasks.register('copyPrivate', Copy) {
-	from 'cloud-config-private'
-	include "config-server.properties"
-	into 'application/config/src/main/resources'
+    from 'cloud-config-private'
+    include "config-server.properties"
+    into 'application/config/src/main/resources'
+}
+
+editorconfig {
+    excludes = [
+            'build',
+            'node_modules',
+            '.husky',
+            'cloud-config-private',
+            'application/**/build',
+            'common/**/build',
+            'domain/**/build',
+            'application/**/generated',
+            'gradlew.bat',
+            '**/application.properties',
+            '.editorconfig',
+            '.husky/commit-msg',
+            '**/config-server.properties',
+            '**/build.gradle',
+            '**/application.yml',
+            'application/**/data',
+            '**/*.dblwr',
+            'settings.gradle',
+            '**/docker-infra'
+    ]
+}
+
+check.dependsOn editorconfigCheck
+
+checkstyle {
+    toolVersion = "8.42"
+    configFile = file("${rootDir}/rule-config/naver-checkstyle-rules.xml")
+    configProperties = ["suppressionFile": "${rootDir}/rule-config/naver-checkstyle-suppressions.xml"]
+    maxWarnings = 0
+    ignoreFailures = false
 }
