@@ -20,4 +20,8 @@ public class StoreWriter {
 	public Store updateStoreInfo(Store previousStore, StoreInfo requestChangeStoreInfo) {
 		return storeRepository.changeStoreInfo(previousStore, requestChangeStoreInfo);
 	}
+
+	public void deleteStore(Store previousStore) {
+		storeRepository.deleteStore(previousStore);
+	}
 }

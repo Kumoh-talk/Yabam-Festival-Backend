@@ -219,4 +219,111 @@ class StoreServiceTest extends ServiceTest {
 		}
 	}
 
+	@Nested
+	@DisplayName("가게 삭제시")
+	class deleteStore {
+		@Test
+		void 성공() {
+			// given
+			Owner savedOwner = GENERAL_OWNER();
+			Long queryOwnerId = savedOwner.getOwnerId();
+			Long queryStoreId = GENERAL_STORE().getStoreId();
+			Store savedStore = GENERAL_STORE();
+
+			doReturn(Optional.of(savedOwner))
+				.when(ownerReader).findOwner(queryOwnerId);
+			doReturn(Optional.of(savedStore))
+				.when(storeReader).readSingleStore(queryStoreId);
+
+			// when
+			storeService.deleteStore(queryOwnerId, queryStoreId);
+
+			// then
+			assertSoftly(softly -> {
+				verify(ownerReader)
+					.findOwner(anyLong());
+				verify(storeReader)
+					.readSingleStore(any(Long.class));
+				verify(storeWriter)
+					.deleteStore(any(Store.class));
+			});
+		}
+
+		@Test
+		void 실패_유효하지_않은_점주_ID() {
+			// given
+			Long queryOwnerId = GENERAL_OWNER().getOwnerId();
+			Long queryStoreId = GENERAL_STORE().getStoreId();
+
+			doReturn(Optional.empty())
+				.when(ownerReader).findOwner(queryOwnerId);
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(() -> storeService.deleteStore(queryOwnerId, queryStoreId))
+					.isInstanceOf(ServiceException.class)
+					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_VALID_OWNER);
+
+				verify(ownerReader)
+					.findOwner(anyLong());
+				verify(storeReader, never())
+					.readSingleStore(any(Long.class));
+				verify(storeWriter, never())
+					.deleteStore(any(Store.class));
+			});
+		}
+
+		@Test
+		void 실패_유효하지_않는_가게_ID() {
+			// given
+			Long queryOwnerId = GENERAL_OWNER().getOwnerId();
+			Long queryStoreId = GENERAL_STORE().getStoreId();
+
+			doReturn(Optional.of(GENERAL_OWNER()))
+				.when(ownerReader).findOwner(queryOwnerId);
+			doReturn(Optional.empty())
+				.when(storeReader).readSingleStore(queryStoreId);
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(() -> storeService.deleteStore(queryOwnerId, queryStoreId))
+					.isInstanceOf(ServiceException.class)
+					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_STORE);
+
+				verify(ownerReader)
+					.findOwner(anyLong());
+				verify(storeReader)
+					.readSingleStore(any(Long.class));
+				verify(storeWriter, never())
+					.deleteStore(any(Store.class));
+			});
+		}
+
+		@Test
+		void 실패_가게ID와_점주ID가_다를시() {
+			// given
+			Long queryOwnerId = GENERAL_OWNER_DIFFERENT().getOwnerId();
+			Long queryStoreId = GENERAL_STORE().getStoreId();
+			Store savedStore = GENERAL_STORE();
+
+			doReturn(Optional.of(GENERAL_OWNER_DIFFERENT()))
+				.when(ownerReader).findOwner(queryOwnerId);
+			doReturn(Optional.of(savedStore))
+				.when(storeReader).readSingleStore(queryStoreId);
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(() -> storeService.deleteStore(queryOwnerId, queryStoreId))
+					.isInstanceOf(ServiceException.class)
+					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_EQUAL_STORE_OWNER);
+
+				verify(ownerReader)
+					.findOwner(anyLong());
+				verify(storeReader)
+					.readSingleStore(any(Long.class));
+				verify(storeWriter, never())
+					.deleteStore(any(Store.class));
+			});
+		}
+	}
 }

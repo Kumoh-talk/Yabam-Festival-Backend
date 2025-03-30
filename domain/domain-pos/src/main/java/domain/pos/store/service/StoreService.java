@@ -64,4 +64,22 @@ public class StoreService {
 	private static boolean isEqualSavedStoreOwnerAndQueryOwner(Long ownerId, Store previousStore) {
 		return !previousStore.getStoreOwner().getOwnerId().equals(ownerId);
 	}
+
+	public void deleteStore(Long ownerId, Long storeId) {
+		Owner owner = ownerReader.findOwner(ownerId)
+			.orElseThrow(() -> {
+				log.warn("점주 조회 실패: ownerId={}", ownerId);
+				throw new ServiceException(ErrorCode.NOT_VALID_OWNER);
+			});
+		final Store previousStore = storeReader.readSingleStore(storeId)
+			.orElseThrow(() -> {
+				log.warn("가게 조회 실패: storeId={}", storeId);
+				throw new ServiceException(ErrorCode.NOT_FOUND_STORE);
+			});
+		if (isEqualSavedStoreOwnerAndQueryOwner(ownerId, previousStore)) {
+			log.warn("삭제 요청 실패: ownerId={}, queryStoreId={}", ownerId, storeId);
+			throw new ServiceException(ErrorCode.NOT_EQUAL_STORE_OWNER);
+		}
+		storeWriter.deleteStore(previousStore);
+	}
 }

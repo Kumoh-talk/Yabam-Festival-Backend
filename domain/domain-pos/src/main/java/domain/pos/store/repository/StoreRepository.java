@@ -12,4 +12,6 @@ public interface StoreRepository {
 	Optional<Store> findStoreByStoreId(Long storeId);
 
 	Store changeStoreInfo(Store previousStore, StoreInfo requestChangeStoreInfo);
+
+	void deleteStore(Store previousStore);
 }
