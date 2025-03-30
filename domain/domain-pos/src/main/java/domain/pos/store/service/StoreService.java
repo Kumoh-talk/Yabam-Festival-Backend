@@ -30,7 +30,11 @@ public class StoreService {
 	}
 
 	public Store findStore(final Long storeId) {
-		return storeReader.readSingleStore(storeId);
+		return storeReader.readSingleStore(storeId)
+			.orElseThrow(() -> {
+				log.warn("가게 조회 실패: storeId={}", storeId);
+				throw new ServiceException(ErrorCode.NOT_FOUND_STORE);
+			});
 	}
 
 	public Store updateStoreInfo(
@@ -38,7 +42,11 @@ public class StoreService {
 		final Long queryStoreId,
 		final StoreInfo requestChangeStoreInfo) {
 
-		final Store previousStore = storeReader.readSingleStore(queryStoreId);
+		final Store previousStore = storeReader.readSingleStore(queryStoreId)
+			.orElseThrow(() -> {
+				log.warn("가게 조회 실패: storeId={}", queryStoreId);
+				throw new ServiceException(ErrorCode.NOT_FOUND_STORE);
+			});
 
 		if (isEqualSavedStoreOwnerAndQueryOwner(ownerId, previousStore)) {
 			log.warn("수정 요청 실패: ownerId={}, queryStoreId={}", ownerId, queryStoreId);

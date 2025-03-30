@@ -5,6 +5,8 @@ import static fixtures.store.StoreFixture.*;
 import static org.assertj.core.api.SoftAssertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -94,7 +96,7 @@ class StoreServiceTest extends ServiceTest {
 			Long queryStoreId = GENERAL_STORE().getStoreId();
 			Store responseStore = GENERAL_STORE();
 
-			doReturn(responseStore)
+			doReturn(Optional.of(responseStore))
 				.when(storeReader).readSingleStore(queryStoreId);
 
 			// when
@@ -103,6 +105,25 @@ class StoreServiceTest extends ServiceTest {
 			// then
 			assertSoftly(softly -> {
 				softly.assertThat(responseStore).isEqualTo(savedStore);
+
+				verify(storeReader)
+					.readSingleStore(queryStoreId);
+			});
+		}
+
+		@Test
+		void 실패_유효하지_않은_가게_ID() {
+			// given
+			Long queryStoreId = GENERAL_STORE().getStoreId();
+
+			doReturn(Optional.empty())
+				.when(storeReader).readSingleStore(queryStoreId);
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(() -> storeService.findStore(queryStoreId))
+					.isInstanceOf(ServiceException.class)
+					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_STORE);
 
 				verify(storeReader)
 					.readSingleStore(queryStoreId);
@@ -121,7 +142,7 @@ class StoreServiceTest extends ServiceTest {
 			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
 			Store changedStore = CHANGED_GENERAL_STORE();
 
-			doReturn(nonChangedStore)
+			doReturn(Optional.of(nonChangedStore))
 				.when(storeReader).readSingleStore(queryStoreId);
 			doReturn(changedStore)
 				.when(storeWriter).updateStoreInfo(nonChangedStore, requestChangeStoreInfo);
@@ -149,7 +170,7 @@ class StoreServiceTest extends ServiceTest {
 			Store previousStore = GENERAL_STORE();
 			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
 
-			doReturn(previousStore)
+			doReturn(Optional.of(previousStore))
 				.when(storeReader).readSingleStore(queryStoreId);
 
 			// when -> then
@@ -166,6 +187,32 @@ class StoreServiceTest extends ServiceTest {
 					.updateStoreInfo(any(Store.class), any(StoreInfo.class));
 			});
 
+		}
+
+		@Test
+		void 실패_유효하지_않는_가게_ID() {
+			// given
+			Long queryOwnerId = GENERAL_OWNER().getOwnerId();
+			Long queryStoreId = GENERAL_STORE().getStoreId();
+			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
+
+			doReturn(Optional.empty())
+				.when(storeReader).readSingleStore(queryStoreId);
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(() -> storeService.updateStoreInfo(
+						queryOwnerId,
+						queryStoreId,
+						requestChangeStoreInfo
+					))
+					.isInstanceOf(ServiceException.class)
+					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_STORE);
+
+				verify(storeReader).readSingleStore(any(Long.class));
+				verify(storeWriter, never())
+					.updateStoreInfo(any(Store.class), any(StoreInfo.class));
+			});
 		}
 	}
 
