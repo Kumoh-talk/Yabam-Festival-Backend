@@ -1,5 +1,7 @@
 package domain.pos.store.implement;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Component;
 
 import domain.pos.store.entity.Store;
@@ -11,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 public class StoreReader {
 	private final StoreRepository storeRepository;
 
-	public Store readSingleStore(Long storeId) {
+	public Optional<Store> readSingleStore(Long storeId) {
 		return storeRepository.findStoreByStoreId(storeId);
 	}
 }
