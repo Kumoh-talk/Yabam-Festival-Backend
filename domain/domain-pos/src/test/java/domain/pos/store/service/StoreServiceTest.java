@@ -2,6 +2,7 @@ package domain.pos.store.service;
 
 import static fixtures.member.OwnerFixture.*;
 import static fixtures.store.StoreFixture.*;
+import static fixtures.store.StoreInfoFixture.*;
 import static org.assertj.core.api.SoftAssertions.*;
 import static org.mockito.Mockito.*;
 
@@ -46,7 +47,7 @@ class StoreServiceTest extends ServiceTest {
 		@Test
 		void 성공() {
 			// given
-			StoreInfo requestStoreInfo = CREATE_REQUEST_STORE_INFO();
+			StoreInfo requestStoreInfo = GENERAL_STORE_INFO();
 			Long ownerId = GENERAL_OWNER().getOwnerId();
 			Owner savedOwner = GENERAL_OWNER();
 
@@ -71,7 +72,7 @@ class StoreServiceTest extends ServiceTest {
 		@Test
 		void 실패_점주_유효성검사() {
 			// given
-			StoreInfo requestStoreInfo = CREATE_REQUEST_STORE_INFO();
+			StoreInfo requestStoreInfo = GENERAL_STORE_INFO();
 			Owner savedOwner = GENERAL_OWNER();
 
 			doThrow(new ServiceException(ErrorCode.NOT_VALID_OWNER))

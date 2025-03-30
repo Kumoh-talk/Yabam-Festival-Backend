@@ -18,10 +18,6 @@ public class StoreFixture {
 	private static final StoreInfo GENERAL_STORE_INFO = GENERAL_STORE_INFO();
 	private static final StoreInfo GENERAL_CHANGED_STORE_INFO = CHANGED_GENERAL_STORE_INFO();
 
-	public static StoreInfo CREATE_REQUEST_STORE_INFO() {
-		return new StoreInfo();
-	}
-
 	public static Store GENERAL_STORE() {
 		return new Store(
 			STORE_ID,
