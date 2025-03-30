@@ -6,7 +6,7 @@ import com.exception.ErrorCode;
 import com.exception.ServiceException;
 
 import domain.pos.member.entity.Owner;
-import domain.pos.member.implement.OwnerValidator;
+import domain.pos.member.implement.OwnerReader;
 import domain.pos.store.entity.Store;
 import domain.pos.store.entity.StoreInfo;
 import domain.pos.store.implement.StoreReader;
@@ -18,12 +18,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class StoreService {
-	private final OwnerValidator ownerValidator;
+	private final OwnerReader ownerReader;
 	private final StoreWriter storeWriter;
 	private final StoreReader storeReader;
 
-	public Long createStore(final Owner owner, final StoreInfo createRequestStoreInfo) {
-		ownerValidator.validateOwner(owner);
+	public Long createStore(final Long ownerId, final StoreInfo createRequestStoreInfo) {
+		Owner owner = ownerReader.findOwner(ownerId)
+			.orElseThrow(() -> {
+				log.warn("점주 조회 실패: ownerId={}", ownerId);
+				throw new ServiceException(ErrorCode.NOT_VALID_OWNER);
+			});
 
 		final Long savedStoreId = storeWriter.createStore(owner, createRequestStoreInfo);
 		return savedStoreId;

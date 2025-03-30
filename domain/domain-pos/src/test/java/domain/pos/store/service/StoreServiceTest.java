@@ -18,7 +18,7 @@ import com.exception.ServiceException;
 
 import base.ServiceTest;
 import domain.pos.member.entity.Owner;
-import domain.pos.member.implement.OwnerValidator;
+import domain.pos.member.implement.OwnerReader;
 import domain.pos.store.entity.Store;
 import domain.pos.store.entity.StoreInfo;
 import domain.pos.store.implement.StoreReader;
@@ -27,7 +27,7 @@ import domain.pos.store.implement.StoreWriter;
 class StoreServiceTest extends ServiceTest {
 
 	@Mock
-	private OwnerValidator ownerValidator;
+	private OwnerReader ownerReader;
 
 	@Mock
 	private StoreWriter storeWriter;
@@ -47,21 +47,24 @@ class StoreServiceTest extends ServiceTest {
 		void 성공() {
 			// given
 			StoreInfo requestStoreInfo = CREATE_REQUEST_STORE_INFO();
-			Owner owner = GENERAL_OWNER();
+			Long ownerId = GENERAL_OWNER().getOwnerId();
+			Owner savedOwner = GENERAL_OWNER();
 
+			doReturn(Optional.of(savedOwner))
+				.when(ownerReader).findOwner(ownerId);
 			doReturn(SAVED_STORE_ID)
-				.when(storeWriter).createStore(owner, requestStoreInfo);
+				.when(storeWriter).createStore(savedOwner, requestStoreInfo);
 
 			// when
-			Long storeId = storeService.createStore(owner, requestStoreInfo);
+			Long storeId = storeService.createStore(ownerId, requestStoreInfo);
 			// then
 			assertSoftly(softly -> {
 				softly.assertThat(storeId).isEqualTo(SAVED_STORE_ID);
 
-				verify(ownerValidator)
-					.validateOwner(owner);
+				verify(ownerReader)
+					.findOwner(any(Long.class));
 				verify(storeWriter)
-					.createStore(owner, requestStoreInfo);
+					.createStore(any(Owner.class), any(StoreInfo.class));
 			});
 		}
 
@@ -69,18 +72,18 @@ class StoreServiceTest extends ServiceTest {
 		void 실패_점주_유효성검사() {
 			// given
 			StoreInfo requestStoreInfo = CREATE_REQUEST_STORE_INFO();
-			Owner owner = GENERAL_OWNER();
+			Owner savedOwner = GENERAL_OWNER();
 
 			doThrow(new ServiceException(ErrorCode.NOT_VALID_OWNER))
-				.when(ownerValidator).validateOwner(owner);
+				.when(ownerReader).findOwner(savedOwner.getOwnerId());
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> storeService.createStore(owner, requestStoreInfo))
+				softly.assertThatThrownBy(() -> storeService.createStore(savedOwner.getOwnerId(), requestStoreInfo))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_VALID_OWNER);
-				verify(ownerValidator)
-					.validateOwner(owner);
+				verify(ownerReader)
+					.findOwner(any(Long.class));
 				verify(storeWriter, never())
 					.createStore(any(), any());
 			});
