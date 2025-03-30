@@ -1,5 +1,6 @@
 package domain.pos.store.service;
 
+import static fixtures.member.OwnerFixture.*;
 import static fixtures.store.StoreFixture.*;
 import static org.assertj.core.api.SoftAssertions.*;
 import static org.mockito.Mockito.*;
@@ -44,7 +45,7 @@ class StoreServiceTest extends ServiceTest {
 		void 성공() {
 			// given
 			StoreInfo requestStoreInfo = CREATE_REQUEST_STORE_INFO();
-			Owner owner = new Owner();
+			Owner owner = GENERAL_OWNER();
 
 			doReturn(SAVED_STORE_ID)
 				.when(storeWriter).createStore(owner, requestStoreInfo);
@@ -66,7 +67,7 @@ class StoreServiceTest extends ServiceTest {
 		void 실패_점주_유효성검사() {
 			// given
 			StoreInfo requestStoreInfo = CREATE_REQUEST_STORE_INFO();
-			Owner owner = new Owner();
+			Owner owner = GENERAL_OWNER();
 
 			doThrow(new ServiceException(ErrorCode.NOT_VALID_OWNER))
 				.when(ownerValidator).validateOwner(owner);
@@ -108,4 +109,64 @@ class StoreServiceTest extends ServiceTest {
 			});
 		}
 	}
+
+	@Nested
+	@DisplayName("가게 수정")
+	class updateStore {
+		@Test
+		void 성공() {
+			// given
+			Long queryStoreId = GENERAL_STORE().getStoreId();
+			Store nonChangedStore = GENERAL_STORE();
+			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
+			Store changedStore = CHANGED_GENERAL_STORE();
+
+			doReturn(nonChangedStore)
+				.when(storeReader).readSingleStore(queryStoreId);
+			doReturn(changedStore)
+				.when(storeWriter).updateStoreInfo(nonChangedStore, requestChangeStoreInfo);
+
+			// when
+			Store result = storeService.updateStoreInfo(
+				nonChangedStore.getStoreId(),
+				queryStoreId,
+				requestChangeStoreInfo);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(result.getStoreId()).isEqualTo(changedStore.getStoreId());
+
+				verify(storeReader).readSingleStore(any(Long.class));
+				verify(storeWriter).updateStoreInfo(any(Store.class), any(StoreInfo.class));
+			});
+		}
+
+		@Test
+		void 실패_수정_요청자가_가게_OWNER와_다를시() {
+			// given
+			Long diffOwnerId = GENERAL_OWNER_DIFFERENT().getOwnerId();
+			Long queryStoreId = GENERAL_STORE().getStoreId();
+			Store previousStore = GENERAL_STORE();
+			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
+
+			doReturn(previousStore)
+				.when(storeReader).readSingleStore(queryStoreId);
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(() -> storeService.updateStoreInfo(
+						diffOwnerId,
+						queryStoreId,
+						requestChangeStoreInfo))
+					.isInstanceOf(ServiceException.class)
+					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_EQUAL_STORE_OWNER);
+
+				verify(storeReader).readSingleStore(any(Long.class));
+				verify(storeWriter, never())
+					.updateStoreInfo(any(Store.class), any(StoreInfo.class));
+			});
+
+		}
+	}
+
 }

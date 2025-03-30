@@ -8,4 +8,6 @@ public interface StoreRepository {
 	Long createStore(Owner owner, StoreInfo createRequestStoreInfo);
 
 	Store findStoreByStoreId(Long storeId);
+
+	Store changeStoreInfo(Store previousStore, StoreInfo requestChangeStoreInfo);
 }
