@@ -1,0 +1,13 @@
+oauth2:
+  client:
+    provider:
+      apple:
+        jwks-uri: mock
+        secret: mock_secret
+      google:
+        jwks-uri: https://www.googleapis.com
+        secret: googleSecret
+        issuer: https://accounts.google.com
+      kakao:
+        jwks-uri: mock
+        secret: mock_secret
