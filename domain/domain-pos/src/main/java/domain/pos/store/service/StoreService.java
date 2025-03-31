@@ -30,10 +30,12 @@ public class StoreService {
 			});
 
 		final Long savedStoreId = storeWriter.createStore(owner, createRequestStoreInfo);
+		log.info("가게 생성 성공 : ownerId={}, storeId={}", ownerId, savedStoreId);
 		return savedStoreId;
 	}
 
 	public Store findStore(final Long storeId) {
+		log.info("가게 조회: storeId={}", storeId);
 		return storeReader.readSingleStore(storeId)
 			.orElseThrow(() -> {
 				log.warn("가게 조회 실패: storeId={}", storeId);
@@ -57,11 +59,15 @@ public class StoreService {
 			throw new ServiceException(ErrorCode.NOT_EQUAL_STORE_OWNER);
 		}
 
-		return storeWriter
+		Store updatedStore = storeWriter
 			.updateStoreInfo(previousStore, requestChangeStoreInfo);
+		log.info("가게 정보 수정 성공 : ownerId={}, storeId={}", ownerId, queryStoreId);
+
+		return updatedStore;
 	}
 
-	private static boolean isEqualSavedStoreOwnerAndQueryOwner(Long ownerId, Store previousStore) {
+	// 가게 소유자와 요청 점주가 같은지 확인
+	private boolean isEqualSavedStoreOwnerAndQueryOwner(Long ownerId, Store previousStore) {
 		return !previousStore.getStoreOwner().getOwnerId().equals(ownerId);
 	}
 
@@ -81,5 +87,6 @@ public class StoreService {
 			throw new ServiceException(ErrorCode.NOT_EQUAL_STORE_OWNER);
 		}
 		storeWriter.deleteStore(previousStore);
+		log.info("가게 삭제 성공 : ownerId={}, storeId={}", ownerId, storeId);
 	}
 }
