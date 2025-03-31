@@ -17,13 +17,17 @@ public class StoreInfoFixture {
 	// 가게 이미지 파일 url
 	private static final String STORE_IMAGE_URL = "https://www.yabam.com/store.jpg";
 	private static final String STORE_IMAGE_URL_2 = "https://www.geumoh.com/store.jpg";
+	// 가게 대학교
+	private static final String STORE_UNIVERSITY = "금오공과대학교";
+	private static final String STORE_UNIVERSITY_2 = "서울대학교";
 
 	public static StoreInfo GENERAL_STORE_INFO() {
 		return StoreInfo.of(
 			STORE_NAME,
 			STORE_LOCATION,
 			STORE_DESCRIPTION,
-			STORE_IMAGE_URL
+			STORE_IMAGE_URL,
+			STORE_UNIVERSITY
 		);
 	}
 
@@ -32,7 +36,8 @@ public class StoreInfoFixture {
 			STORE_NAME_2,
 			STORE_LOCATION_2,
 			STORE_DESCRIPTION_2,
-			STORE_IMAGE_URL_2
+			STORE_IMAGE_URL_2,
+			STORE_UNIVERSITY_2
 		);
 	}
 }

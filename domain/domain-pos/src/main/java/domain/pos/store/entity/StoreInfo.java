@@ -10,19 +10,24 @@ public class StoreInfo {
 	private final Point2D.Double location;
 	private final String desciption;
 	private final String headImageUrl;
+	private final String university;
 
-	private StoreInfo(String storeName, Point2D.Double location, String desciption, String headImageUrl) {
+	private StoreInfo(String storeName, Point2D.Double location, String desciption, String headImageUrl,
+		String university) {
 		this.storeName = storeName;
 		this.location = location;
 		this.desciption = desciption;
 		this.headImageUrl = headImageUrl;
+		this.university = university;
 	}
 
-	public static StoreInfo of(String storeName, Point2D.Double location, String desciption, String headImageUrl) {
+	public static StoreInfo of(String storeName, Point2D.Double location, String desciption, String headImageUrl,
+		String university) {
 		return new StoreInfo(
 			storeName,
 			location,
 			desciption,
-			headImageUrl);
+			headImageUrl,
+			university);
 	}
 }
