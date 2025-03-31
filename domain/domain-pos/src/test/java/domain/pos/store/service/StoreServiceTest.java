@@ -141,11 +141,15 @@ class StoreServiceTest extends ServiceTest {
 		@Test
 		void 성공() {
 			// given
+			Owner savedOwner = GENERAL_OWNER();
+			Long queryOwnerId = savedOwner.getOwnerId();
 			Long queryStoreId = GENERAL_STORE().getStoreId();
 			Store nonChangedStore = GENERAL_STORE();
 			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
 			Store changedStore = CHANGED_GENERAL_STORE();
 
+			doReturn(Optional.of(savedOwner))
+				.when(ownerReader).findOwner(queryOwnerId);
 			doReturn(Optional.of(nonChangedStore))
 				.when(storeReader).readSingleStore(queryStoreId);
 			doReturn(changedStore)
@@ -153,7 +157,7 @@ class StoreServiceTest extends ServiceTest {
 
 			// when
 			Store result = storeService.updateStoreInfo(
-				nonChangedStore.getStoreId(),
+				queryOwnerId,
 				queryStoreId,
 				requestChangeStoreInfo);
 
@@ -161,19 +165,50 @@ class StoreServiceTest extends ServiceTest {
 			assertSoftly(softly -> {
 				softly.assertThat(result.getStoreId()).isEqualTo(changedStore.getStoreId());
 
+				verify(ownerReader).findOwner(any(Long.class));
 				verify(storeReader).readSingleStore(any(Long.class));
 				verify(storeWriter).updateStoreInfo(any(Store.class), any(StoreInfo.class));
 			});
 		}
 
 		@Test
+		void 실패_유효하지_않은_OWNER() {
+			//given
+			Long ownerId = GENERAL_OWNER_DIFFERENT().getOwnerId();
+			Long queryStoreId = GENERAL_STORE().getStoreId();
+			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
+
+			doReturn(Optional.empty())
+				.when(ownerReader).findOwner(anyLong());
+			//when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(() ->
+						storeService.updateStoreInfo(
+							ownerId,
+							queryStoreId,
+							requestChangeStoreInfo))
+					.isInstanceOf(ServiceException.class)
+					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_VALID_OWNER);
+
+				verify(ownerReader).findOwner(any(Long.class));
+				verify(storeReader, never())
+					.readSingleStore(ownerId);
+				verify(storeWriter, never())
+					.updateStoreInfo(any(Store.class), any(StoreInfo.class));
+			});
+		}
+
+		@Test
 		void 실패_수정_요청자가_가게_OWNER와_다를시() {
 			// given
-			Long diffOwnerId = GENERAL_OWNER_DIFFERENT().getOwnerId();
+			Owner savedDiffOwner = GENERAL_OWNER_DIFFERENT();
+			Long diffOwnerId = savedDiffOwner.getOwnerId();
 			Long queryStoreId = GENERAL_STORE().getStoreId();
 			Store previousStore = GENERAL_STORE();
 			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
 
+			doReturn(Optional.of(savedDiffOwner))
+				.when(ownerReader).findOwner(diffOwnerId);
 			doReturn(Optional.of(previousStore))
 				.when(storeReader).readSingleStore(queryStoreId);
 
@@ -186,6 +221,7 @@ class StoreServiceTest extends ServiceTest {
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_EQUAL_STORE_OWNER);
 
+				verify(ownerReader).findOwner(any(Long.class));
 				verify(storeReader).readSingleStore(any(Long.class));
 				verify(storeWriter, never())
 					.updateStoreInfo(any(Store.class), any(StoreInfo.class));
@@ -196,10 +232,13 @@ class StoreServiceTest extends ServiceTest {
 		@Test
 		void 실패_유효하지_않는_가게_ID() {
 			// given
-			Long queryOwnerId = GENERAL_OWNER().getOwnerId();
+			Owner savedOwner = GENERAL_OWNER();
+			Long queryOwnerId = savedOwner.getOwnerId();
 			Long queryStoreId = GENERAL_STORE().getStoreId();
 			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
 
+			doReturn(Optional.of(savedOwner))
+				.when(ownerReader).findOwner(queryOwnerId);
 			doReturn(Optional.empty())
 				.when(storeReader).readSingleStore(queryStoreId);
 
@@ -213,6 +252,7 @@ class StoreServiceTest extends ServiceTest {
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_STORE);
 
+				verify(ownerReader).findOwner(anyLong());
 				verify(storeReader).readSingleStore(any(Long.class));
 				verify(storeWriter, never())
 					.updateStoreInfo(any(Store.class), any(StoreInfo.class));

@@ -47,6 +47,11 @@ public class StoreService {
 		final Long ownerId,
 		final Long queryStoreId,
 		final StoreInfo requestChangeStoreInfo) {
+		ownerReader.findOwner(ownerId)
+			.orElseThrow(() -> {
+				log.warn("점주 조회 실패: ownerId={}", ownerId);
+				throw new ServiceException(ErrorCode.NOT_VALID_OWNER);
+			});
 
 		final Store previousStore = storeReader.readSingleStore(queryStoreId)
 			.orElseThrow(() -> {
@@ -72,7 +77,7 @@ public class StoreService {
 	}
 
 	public void deleteStore(Long ownerId, Long storeId) {
-		Owner owner = ownerReader.findOwner(ownerId)
+		ownerReader.findOwner(ownerId)
 			.orElseThrow(() -> {
 				log.warn("점주 조회 실패: ownerId={}", ownerId);
 				throw new ServiceException(ErrorCode.NOT_VALID_OWNER);
