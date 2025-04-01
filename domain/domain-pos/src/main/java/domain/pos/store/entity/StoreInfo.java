@@ -13,7 +13,8 @@ public class StoreInfo {
 	private final String headImageUrl;
 	private final String university;
 
-	public StoreInfo(Long storeId, String storeName, Point2D.Double location, String desciption, String headImageUrl, String university) {
+	public StoreInfo(Long storeId, String storeName, Point2D.Double location, String desciption, String headImageUrl,
+		String university) {
 		this.storeId = storeId;
 		this.storeName = storeName;
 		this.location = location;
