@@ -193,7 +193,7 @@ public class MenuServiceTest extends ServiceTest {
 			assertSoftly(softly -> {
 				softly.assertThat(serviceMenuSlice.getSize()).isEqualTo(size);
 				softly.assertThat(serviceMenuSlice.hasNext()).isEqualTo(hasNext);
-				softly.assertThat(serviceMenuSlice.getContent().getFirst().getMenuId()).isEqualTo(lastMenuId + 1);
+				softly.assertThat(serviceMenuSlice.getContent().get(0).getMenuId()).isEqualTo(lastMenuId + 1);
 			});
 		}
 
