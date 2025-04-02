@@ -2,7 +2,7 @@ package domain.pos.store.implement;
 
 import org.springframework.stereotype.Component;
 
-import domain.pos.member.entity.Owner;
+import domain.pos.member.entity.UserPassport;
 import domain.pos.store.entity.Store;
 import domain.pos.store.entity.StoreInfo;
 import domain.pos.store.repository.StoreRepository;
@@ -13,8 +13,8 @@ import lombok.RequiredArgsConstructor;
 public class StoreWriter {
 	private final StoreRepository storeRepository;
 
-	public Long createStore(Owner owner, StoreInfo createRequestStoreInfo) {
-		return storeRepository.createStore(owner, createRequestStoreInfo);
+	public Long createStore(UserPassport userPassport, StoreInfo createRequestStoreInfo) {
+		return storeRepository.createStore(userPassport, createRequestStoreInfo);
 	}
 
 	public Store updateStoreInfo(Store previousStore, StoreInfo requestChangeStoreInfo) {

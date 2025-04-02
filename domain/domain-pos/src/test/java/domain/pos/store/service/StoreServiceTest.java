@@ -1,6 +1,6 @@
 package domain.pos.store.service;
 
-import static fixtures.member.OwnerFixture.*;
+import static fixtures.member.UserFixture.*;
 import static fixtures.store.StoreFixture.*;
 import static fixtures.store.StoreInfoFixture.*;
 import static org.assertj.core.api.SoftAssertions.*;
@@ -18,7 +18,7 @@ import com.exception.ErrorCode;
 import com.exception.ServiceException;
 
 import base.ServiceTest;
-import domain.pos.member.entity.Owner;
+import domain.pos.member.entity.UserPassport;
 import domain.pos.member.implement.OwnerReader;
 import domain.pos.store.entity.Store;
 import domain.pos.store.entity.StoreInfo;
@@ -48,24 +48,19 @@ class StoreServiceTest extends ServiceTest {
 		void 성공() {
 			// given
 			StoreInfo requestStoreInfo = GENERAL_STORE_INFO();
-			Long ownerId = GENERAL_OWNER().getOwnerId();
-			Owner savedOwner = GENERAL_OWNER();
+			UserPassport userPassport = OWNER_USER_PASSPORT();
 
-			doReturn(Optional.of(savedOwner))
-				.when(ownerReader).findOwner(ownerId);
 			doReturn(SAVED_STORE_ID)
-				.when(storeWriter).createStore(savedOwner, requestStoreInfo);
+				.when(storeWriter).createStore(userPassport, requestStoreInfo);
 
 			// when
-			Long storeId = storeService.createStore(ownerId, requestStoreInfo);
+			Long storeId = storeService.createStore(userPassport, requestStoreInfo);
 			// then
 			assertSoftly(softly -> {
 				softly.assertThat(storeId).isEqualTo(SAVED_STORE_ID);
 
-				verify(ownerReader)
-					.findOwner(any(Long.class));
 				verify(storeWriter)
-					.createStore(any(Owner.class), any(StoreInfo.class));
+					.createStore(any(UserPassport.class), any(StoreInfo.class));
 			});
 		}
 
@@ -73,18 +68,14 @@ class StoreServiceTest extends ServiceTest {
 		void 실패_점주_유효성검사() {
 			// given
 			StoreInfo requestStoreInfo = GENERAL_STORE_INFO();
-			Owner savedOwner = GENERAL_OWNER();
-
-			doThrow(new ServiceException(ErrorCode.NOT_VALID_OWNER))
-				.when(ownerReader).findOwner(savedOwner.getOwnerId());
+			UserPassport userPassport = GENERAL_USER_PASSPORT();
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> storeService.createStore(savedOwner.getOwnerId(), requestStoreInfo))
+				softly.assertThatThrownBy(() -> storeService.createStore(userPassport, requestStoreInfo))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_VALID_OWNER);
-				verify(ownerReader)
-					.findOwner(any(Long.class));
+
 				verify(storeWriter, never())
 					.createStore(any(), any());
 			});
@@ -141,15 +132,12 @@ class StoreServiceTest extends ServiceTest {
 		@Test
 		void 성공() {
 			// given
-			Owner savedOwner = GENERAL_OWNER();
-			Long queryOwnerId = savedOwner.getOwnerId();
+			UserPassport queryUserPassport = OWNER_USER_PASSPORT();
 			Long queryStoreId = GENERAL_STORE().getStoreId();
 			Store nonChangedStore = GENERAL_STORE();
 			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
 			Store changedStore = CHANGED_GENERAL_STORE();
 
-			doReturn(Optional.of(savedOwner))
-				.when(ownerReader).findOwner(queryOwnerId);
 			doReturn(Optional.of(nonChangedStore))
 				.when(storeReader).readSingleStore(queryStoreId);
 			doReturn(changedStore)
@@ -157,7 +145,7 @@ class StoreServiceTest extends ServiceTest {
 
 			// when
 			Store result = storeService.updateStoreInfo(
-				queryOwnerId,
+				queryUserPassport,
 				queryStoreId,
 				requestChangeStoreInfo);
 
@@ -165,7 +153,6 @@ class StoreServiceTest extends ServiceTest {
 			assertSoftly(softly -> {
 				softly.assertThat(result.getStoreId()).isEqualTo(changedStore.getStoreId());
 
-				verify(ownerReader).findOwner(any(Long.class));
 				verify(storeReader).readSingleStore(any(Long.class));
 				verify(storeWriter).updateStoreInfo(any(Store.class), any(StoreInfo.class));
 			});
@@ -174,25 +161,22 @@ class StoreServiceTest extends ServiceTest {
 		@Test
 		void 실패_유효하지_않은_OWNER() {
 			//given
-			Long ownerId = GENERAL_OWNER_DIFFERENT().getOwnerId();
+			UserPassport queryUserPassport = GENERAL_USER_PASSPORT();
 			Long queryStoreId = GENERAL_STORE().getStoreId();
 			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
 
-			doReturn(Optional.empty())
-				.when(ownerReader).findOwner(anyLong());
 			//when -> then
 			assertSoftly(softly -> {
 				softly.assertThatThrownBy(() ->
 						storeService.updateStoreInfo(
-							ownerId,
+							queryUserPassport,
 							queryStoreId,
 							requestChangeStoreInfo))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_VALID_OWNER);
 
-				verify(ownerReader).findOwner(any(Long.class));
 				verify(storeReader, never())
-					.readSingleStore(ownerId);
+					.readSingleStore(queryStoreId);
 				verify(storeWriter, never())
 					.updateStoreInfo(any(Store.class), any(StoreInfo.class));
 			});
@@ -201,27 +185,23 @@ class StoreServiceTest extends ServiceTest {
 		@Test
 		void 실패_수정_요청자가_가게_OWNER와_다를시() {
 			// given
-			Owner savedDiffOwner = GENERAL_OWNER_DIFFERENT();
-			Long diffOwnerId = savedDiffOwner.getOwnerId();
-			Long queryStoreId = GENERAL_STORE().getStoreId();
+			UserPassport diffOwnerUserPassport = DIFF_OWNER_PASSPORT();
 			Store previousStore = GENERAL_STORE();
+			Long queryStoreId = previousStore.getStoreId();
 			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
 
-			doReturn(Optional.of(savedDiffOwner))
-				.when(ownerReader).findOwner(diffOwnerId);
 			doReturn(Optional.of(previousStore))
 				.when(storeReader).readSingleStore(queryStoreId);
 
 			// when -> then
 			assertSoftly(softly -> {
 				softly.assertThatThrownBy(() -> storeService.updateStoreInfo(
-						diffOwnerId,
+						diffOwnerUserPassport,
 						queryStoreId,
 						requestChangeStoreInfo))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_EQUAL_STORE_OWNER);
 
-				verify(ownerReader).findOwner(any(Long.class));
 				verify(storeReader).readSingleStore(any(Long.class));
 				verify(storeWriter, never())
 					.updateStoreInfo(any(Store.class), any(StoreInfo.class));
@@ -232,27 +212,23 @@ class StoreServiceTest extends ServiceTest {
 		@Test
 		void 실패_유효하지_않는_가게_ID() {
 			// given
-			Owner savedOwner = GENERAL_OWNER();
-			Long queryOwnerId = savedOwner.getOwnerId();
+			UserPassport queryOwnerPassport = OWNER_USER_PASSPORT();
 			Long queryStoreId = GENERAL_STORE().getStoreId();
 			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
 
-			doReturn(Optional.of(savedOwner))
-				.when(ownerReader).findOwner(queryOwnerId);
 			doReturn(Optional.empty())
 				.when(storeReader).readSingleStore(queryStoreId);
 
 			// when -> then
 			assertSoftly(softly -> {
 				softly.assertThatThrownBy(() -> storeService.updateStoreInfo(
-						queryOwnerId,
+						queryOwnerPassport,
 						queryStoreId,
 						requestChangeStoreInfo
 					))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_STORE);
 
-				verify(ownerReader).findOwner(anyLong());
 				verify(storeReader).readSingleStore(any(Long.class));
 				verify(storeWriter, never())
 					.updateStoreInfo(any(Store.class), any(StoreInfo.class));
@@ -266,23 +242,18 @@ class StoreServiceTest extends ServiceTest {
 		@Test
 		void 성공() {
 			// given
-			Owner savedOwner = GENERAL_OWNER();
-			Long queryOwnerId = savedOwner.getOwnerId();
+			UserPassport queryUserPassport = OWNER_USER_PASSPORT();
 			Long queryStoreId = GENERAL_STORE().getStoreId();
 			Store savedStore = GENERAL_STORE();
 
-			doReturn(Optional.of(savedOwner))
-				.when(ownerReader).findOwner(queryOwnerId);
 			doReturn(Optional.of(savedStore))
 				.when(storeReader).readSingleStore(queryStoreId);
 
 			// when
-			storeService.deleteStore(queryOwnerId, queryStoreId);
+			storeService.deleteStore(queryUserPassport, queryStoreId);
 
 			// then
 			assertSoftly(softly -> {
-				verify(ownerReader)
-					.findOwner(anyLong());
 				verify(storeReader)
 					.readSingleStore(any(Long.class));
 				verify(storeWriter)
@@ -293,20 +264,15 @@ class StoreServiceTest extends ServiceTest {
 		@Test
 		void 실패_유효하지_않은_점주_ID() {
 			// given
-			Long queryOwnerId = GENERAL_OWNER().getOwnerId();
+			UserPassport queryOwnerPassport = GENERAL_USER_PASSPORT();
 			Long queryStoreId = GENERAL_STORE().getStoreId();
-
-			doReturn(Optional.empty())
-				.when(ownerReader).findOwner(queryOwnerId);
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> storeService.deleteStore(queryOwnerId, queryStoreId))
+				softly.assertThatThrownBy(() -> storeService.deleteStore(queryOwnerPassport, queryStoreId))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_VALID_OWNER);
 
-				verify(ownerReader)
-					.findOwner(anyLong());
 				verify(storeReader, never())
 					.readSingleStore(any(Long.class));
 				verify(storeWriter, never())
@@ -317,22 +283,18 @@ class StoreServiceTest extends ServiceTest {
 		@Test
 		void 실패_유효하지_않는_가게_ID() {
 			// given
-			Long queryOwnerId = GENERAL_OWNER().getOwnerId();
+			UserPassport queryOwnerPassport = OWNER_USER_PASSPORT();
 			Long queryStoreId = GENERAL_STORE().getStoreId();
 
-			doReturn(Optional.of(GENERAL_OWNER()))
-				.when(ownerReader).findOwner(queryOwnerId);
 			doReturn(Optional.empty())
 				.when(storeReader).readSingleStore(queryStoreId);
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> storeService.deleteStore(queryOwnerId, queryStoreId))
+				softly.assertThatThrownBy(() -> storeService.deleteStore(queryOwnerPassport, queryStoreId))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_STORE);
 
-				verify(ownerReader)
-					.findOwner(anyLong());
 				verify(storeReader)
 					.readSingleStore(any(Long.class));
 				verify(storeWriter, never())
@@ -343,23 +305,19 @@ class StoreServiceTest extends ServiceTest {
 		@Test
 		void 실패_가게ID와_점주ID가_다를시() {
 			// given
-			Long queryOwnerId = GENERAL_OWNER_DIFFERENT().getOwnerId();
+			UserPassport queryDiffOwnerPassport = DIFF_OWNER_PASSPORT();
 			Long queryStoreId = GENERAL_STORE().getStoreId();
 			Store savedStore = GENERAL_STORE();
 
-			doReturn(Optional.of(GENERAL_OWNER_DIFFERENT()))
-				.when(ownerReader).findOwner(queryOwnerId);
 			doReturn(Optional.of(savedStore))
 				.when(storeReader).readSingleStore(queryStoreId);
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> storeService.deleteStore(queryOwnerId, queryStoreId))
+				softly.assertThatThrownBy(() -> storeService.deleteStore(queryDiffOwnerPassport, queryStoreId))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_EQUAL_STORE_OWNER);
 
-				verify(ownerReader)
-					.findOwner(anyLong());
 				verify(storeReader)
 					.readSingleStore(any(Long.class));
 				verify(storeWriter, never())
