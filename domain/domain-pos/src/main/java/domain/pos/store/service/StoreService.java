@@ -7,7 +7,6 @@ import com.exception.ServiceException;
 
 import domain.pos.member.entity.UserPassport;
 import domain.pos.member.entity.UserRole;
-import domain.pos.member.implement.OwnerReader;
 import domain.pos.store.entity.Store;
 import domain.pos.store.entity.StoreInfo;
 import domain.pos.store.implement.StoreReader;
@@ -19,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class StoreService {
-	private final OwnerReader ownerReader;
 	private final StoreWriter storeWriter;
 	private final StoreReader storeReader;
 

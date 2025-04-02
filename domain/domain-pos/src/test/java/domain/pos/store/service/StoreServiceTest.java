@@ -19,16 +19,12 @@ import com.exception.ServiceException;
 
 import base.ServiceTest;
 import domain.pos.member.entity.UserPassport;
-import domain.pos.member.implement.OwnerReader;
 import domain.pos.store.entity.Store;
 import domain.pos.store.entity.StoreInfo;
 import domain.pos.store.implement.StoreReader;
 import domain.pos.store.implement.StoreWriter;
 
 class StoreServiceTest extends ServiceTest {
-
-	@Mock
-	private OwnerReader ownerReader;
 
 	@Mock
 	private StoreWriter storeWriter;
