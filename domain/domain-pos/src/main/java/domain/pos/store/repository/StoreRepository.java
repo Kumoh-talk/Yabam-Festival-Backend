@@ -2,12 +2,12 @@ package domain.pos.store.repository;
 
 import java.util.Optional;
 
-import domain.pos.member.entity.Owner;
+import domain.pos.member.entity.UserPassport;
 import domain.pos.store.entity.Store;
 import domain.pos.store.entity.StoreInfo;
 
 public interface StoreRepository {
-	Long createStore(Owner owner, StoreInfo createRequestStoreInfo);
+	Long createStore(UserPassport userPassport, StoreInfo createRequestStoreInfo);
 
 	Optional<Store> findStoreByStoreId(Long storeId);
 

@@ -25,7 +25,7 @@ public class ExceptionHandlerFilter implements WebFilter {
 			});
 	}
 
-	private Mono<Void> handleServiceException(ServerHttpResponse response, Exception e) {
+	private Mono<Void> handleServiceException(ServerHttpResponse response, Exception exception) {
 		response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
 		response.getHeaders().setContentType(MediaType.valueOf("application/json; charset=UTF-8"));
 
