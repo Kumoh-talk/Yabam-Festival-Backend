@@ -55,7 +55,7 @@ public class SecurityConfig {
 			.addFilterAfter(new AuthenticationToHeaderFilter(serverSecurityContextRepository),
 				SecurityWebFiltersOrder.AUTHENTICATION) // 사용자 정보 헤더 추가 필터 추가
 			.authorizeExchange(exchange -> exchange
-				.anyExchange().permitAll()) // 나머지 요청은 허용
+				.anyExchange().authenticated()) // 모든 요청은 인증 필요
 			.exceptionHandling(exceptionHandling ->
 				exceptionHandling
 					.authenticationEntryPoint(authenticationEntryPoint)

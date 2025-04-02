@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.3' apply(false)
     id 'io.spring.dependency-management' version '1.1.7' apply(false)
-    id 'org.ec4j.editorconfig' version '0.0.2'
+    id 'org.ec4j.editorconfig' version '0.1.0'
     id 'checkstyle'
 }
 
@@ -10,6 +10,8 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
     }
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 configurations {
@@ -124,7 +126,6 @@ editorconfig {
 }
 
 check.dependsOn editorconfigCheck
-
 checkstyle {
     toolVersion = "8.42"
     configFile = file("${rootDir}/rule-config/naver-checkstyle-rules.xml")
