@@ -14,4 +14,8 @@ public class OwnerFixture {
 	public static Owner GENERAL_OWNER_DIFFERENT() {
 		return new Owner(OWNER_ID_DIFFERENT);
 	}
+
+	public static Owner CUSTOM_OWNER(Long ownerId) {
+		return new Owner(ownerId);
+	}
 }
