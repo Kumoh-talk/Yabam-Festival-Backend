@@ -3,10 +3,6 @@ package com.gateway.config;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
-import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -76,17 +72,4 @@ public class SecurityConfig {
 		return new WebSessionServerSecurityContextRepository();
 	}
 
-	@Bean
-	public RoleHierarchy roleHierarchy() {
-		RoleHierarchyImpl roleHierarchyImpl = new RoleHierarchyImpl();
-		roleHierarchyImpl.setHierarchy("ROLE_ADMIN > ROLE_SEMINAR_WRITER > ROLE_ACTIVE_USER > ROLE_USER");
-		return roleHierarchyImpl;
-	}
-
-	@Bean
-	public MethodSecurityExpressionHandler expressionHandler(RoleHierarchy roleHierarchy) {
-		DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
-		expressionHandler.setRoleHierarchy(roleHierarchy);
-		return expressionHandler;
-	}
 }
