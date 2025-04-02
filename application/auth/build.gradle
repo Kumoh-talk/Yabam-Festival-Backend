@@ -7,6 +7,12 @@ jar {
 }
 
 dependencies {
+    // Config Server
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+
+    // Eureka Server
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
     // web
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
