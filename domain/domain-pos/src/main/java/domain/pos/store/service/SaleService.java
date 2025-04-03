@@ -1,7 +1,8 @@
 package domain.pos.store.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.exception.ErrorCode;
 import com.exception.ServiceException;
@@ -25,8 +26,8 @@ public class SaleService {
 	private final SaleReader saleReader;
 	private final StoreWriter storeWriter;
 	private final StoreValidator storeValidator;
+	private final PlatformTransactionManager transactionManager;
 
-	@Transactional
 	public Sale openStore(final UserPassport userPassport, final Long storeId) {
 		final Store previousStore = storeValidator.validateStoreModifyByUser(userPassport, storeId);
 
@@ -34,14 +35,17 @@ public class SaleService {
 			log.warn("가게 활성화 변경 실패: userId={}, storeId={}", userPassport.getUserId(), storeId);
 			throw new ServiceException(ErrorCode.CONFLICT_OPEN_STORE);
 		}
-		final Store opendStore = storeWriter.modifyStoreOpenStatus(previousStore);
-		final Sale createdSale = saleWriter.createSale(opendStore);
+
+		final Sale createdSale = new TransactionTemplate(transactionManager).execute(status -> {
+			final Store opendStore = storeWriter.modifyStoreOpenStatus(previousStore);
+			return saleWriter.createSale(opendStore);
+		});
+
 		log.info("가게 활성화 성공 : userId={}, storeId={}, saleId={}", userPassport.getUserId(), storeId,
 			createdSale.getSaleId());
 		return createdSale;
 	}
 
-	@Transactional
 	public Sale closeStore(final UserPassport userPassport, final Long saleId) {
 		if (isOwner(userPassport)) {
 			log.warn("점주가 아닌 사용자의 요청으로 인한 실패: userId={}", userPassport.getUserId());
@@ -49,9 +53,23 @@ public class SaleService {
 		}
 		final Sale savedSale = saleReader.readSingleSale(saleId)
 			.orElseThrow(() -> {
-				log.warn("가게 조회 실패: saleId={}", saleId);
+				log.warn("판매 내역 조회 실패: saleId={}", saleId);
 				throw new ServiceException(ErrorCode.NOT_FOUND_STORE);
 			});
+
+		validateOpendSaleOrStore(userPassport, saleId, savedSale);
+
+		final Sale closedSale = new TransactionTemplate(transactionManager).execute(status -> {
+			final Store closedStore = storeWriter.modifyStoreOpenStatus(savedSale.getStore());
+			return saleWriter.closeSale(savedSale, closedStore);
+		});
+		log.info("가게 종료 성공 : userId={}, storeId={}, saleId={}", userPassport.getUserId(),
+			savedSale.getStore().getStoreId(), closedSale.getSaleId());
+		return closedSale;
+	}
+
+	// 판매 종료 시점에 가게가 종료된 상태인지 확인
+	private static void validateOpendSaleOrStore(UserPassport userPassport, Long saleId, Sale savedSale) {
 		savedSale.getCloseDateTime()
 			.ifPresent((dateTime) -> {
 				log.warn("이미 종료된 Sale.: userId={}, saleId={}", userPassport.getUserId(), saleId);
@@ -62,11 +80,6 @@ public class SaleService {
 				savedSale.getStore().getStoreId());
 			throw new ServiceException(ErrorCode.CONFLICT_CLOSE_STORE);
 		}
-		final Store closedStore = storeWriter.modifyStoreOpenStatus(savedSale.getStore());
-		final Sale closedSale = saleWriter.closeSale(savedSale, closedStore);
-		log.info("가게 종료 성공 : userId={}, storeId={}, saleId={}", userPassport.getUserId(),
-			savedSale.getStore().getStoreId(), closedSale.getSaleId());
-		return closedSale;
 	}
 
 	// 점주가 아닌 사용자인지 확인
