@@ -4,9 +4,10 @@ import com.gateway.user.Role;
 
 public record JwtUserClaim(
 	Long userId,
-	Role role
+	String userNickname,
+	Role userRole
 ) {
-	public static JwtUserClaim create(Long userId, Role role) {
-		return new JwtUserClaim(userId, role);
+	public static JwtUserClaim create(Long userId, String userNickname, Role userRole) {
+		return new JwtUserClaim(userId, userNickname, userRole);
 	}
 }

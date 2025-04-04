@@ -11,23 +11,25 @@ import com.gateway.user.Role;
 
 public record JwtAuthentication(
 	Long userId,
-	Role role
+	String userNickname,
+	Role userRole
 ) implements Authentication {
 
 	public JwtAuthentication(JwtUserClaim claims) {
 		this(
 			claims.userId(),
-			claims.role()
+			claims.userNickname(),
+			claims.userRole()
 		);
 	}
 
 	public static JwtAuthentication anonymousAuthentication() {
-		return new JwtAuthentication(null, Role.ROLE_ANONYMOUS);
+		return new JwtAuthentication(null, "Anonymous", Role.ROLE_ANONYMOUS);
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return Collections.singleton(new SimpleGrantedAuthority(this.role().name()));
+		return Collections.singleton(new SimpleGrantedAuthority(this.userRole().name()));
 	}
 
 	@Override
