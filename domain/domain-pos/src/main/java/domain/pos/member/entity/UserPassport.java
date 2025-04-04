@@ -14,6 +14,10 @@ public class UserPassport {
 		this.userRole = userRole;
 	}
 
+	public static UserPassport anonymous() {
+		return new UserPassport(null, "Anonymous", UserRole.ROLE_ANONYMOUS);
+	}
+
 	public static UserPassport of(
 		Long userId,
 		String userNickname,
