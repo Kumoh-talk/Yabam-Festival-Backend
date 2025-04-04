@@ -1,20 +1,37 @@
 package com.gateway.filter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.web.server.WebFilterExchange;
+import org.springframework.security.web.server.authentication.ServerAuthenticationFailureHandler;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gateway.exception.JwtTokenInvalidException;
 import com.gateway.jwt.JwtAuthentication;
 
 import reactor.core.publisher.Mono;
 
 public class AuthenticationToHeaderFilter implements WebFilter {
+	private final ObjectMapper objectMapper = new ObjectMapper();
 	private final ServerSecurityContextRepository securityContextRepository;
+	private final ServerAuthenticationFailureHandler authenticationFailureHandler;
 
-	public AuthenticationToHeaderFilter(ServerSecurityContextRepository securityContextRepository) {
+	private final String USER_ID = "userId";
+	private final String USER_NICKNAME = "userNickname";
+	private final String USER_ROLE = "userRole";
+	private final String USER_INFO_HEADER = "X-User-Info";
+
+	public AuthenticationToHeaderFilter(ServerSecurityContextRepository securityContextRepository,
+		ServerAuthenticationFailureHandler authenticationFailureHandler) {
 		this.securityContextRepository = securityContextRepository;
+		this.authenticationFailureHandler = authenticationFailureHandler;
 	}
 
 	@Override
@@ -23,12 +40,19 @@ public class AuthenticationToHeaderFilter implements WebFilter {
 			.map(SecurityContext::getAuthentication)
 			.flatMap(authentication -> {
 				JwtAuthentication jwtAuthentication = (JwtAuthentication)authentication;
-				String userId = String.valueOf(jwtAuthentication.userId()); // 예시: 사용자 ID
-				String authorities = jwtAuthentication.role().name(); // 예시: 권한 정보
 
-				// ServerWebExchange에 헤더 추가
-				exchange.getRequest().getHeaders().add("X-User-Id", userId);
-				exchange.getRequest().getHeaders().add("X-Authorities", authorities);
+				Map<String, Object> userInfo = new HashMap<>();
+				userInfo.put(USER_ID, String.valueOf(jwtAuthentication.userId()));
+				userInfo.put(USER_NICKNAME, jwtAuthentication.userNickname());
+				userInfo.put(USER_ROLE, jwtAuthentication.userRole().name());
+
+				try {
+					String userInfoJson = objectMapper.writeValueAsString(userInfo);
+					exchange.getRequest().getHeaders().add(USER_INFO_HEADER, userInfoJson);
+				} catch (JsonProcessingException e) {
+					authenticationFailureHandler.onAuthenticationFailure(new WebFilterExchange(exchange, chain),
+						new JwtTokenInvalidException(e));
+				}
 
 				return chain.filter(exchange);
 			})
