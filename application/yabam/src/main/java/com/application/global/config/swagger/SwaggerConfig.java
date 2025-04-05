@@ -1,4 +1,4 @@
-package com.application.config.swagger;
+package com.application.global.config.swagger;
 
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;

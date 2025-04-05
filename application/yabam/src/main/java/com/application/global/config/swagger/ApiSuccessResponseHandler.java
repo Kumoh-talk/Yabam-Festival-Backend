@@ -1,4 +1,4 @@
-package com.application.config.swagger;
+package com.application.global.config.swagger;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
