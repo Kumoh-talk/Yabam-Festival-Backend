@@ -8,6 +8,7 @@ public class MenuInfoFixture {
 	private static final int GENERAL_PRICE = 10000;
 	private static final String GENERAL_DESCRIPTION = "menu description";
 	private static final String GENERAL_IMAGEURL = "imageURL";
+	private static final boolean GENERAL_IS_SOLD_OUT = false;
 
 	public static MenuInfo REQUEST_MENU_INFO() {
 		return MenuInfo.builder()
@@ -15,6 +16,7 @@ public class MenuInfoFixture {
 			.price(GENERAL_PRICE)
 			.description(GENERAL_DESCRIPTION)
 			.imageUrl(GENERAL_IMAGEURL)
+			.isSoldOut(GENERAL_IS_SOLD_OUT)
 			.build();
 	}
 
@@ -25,6 +27,7 @@ public class MenuInfoFixture {
 			.price(GENERAL_PRICE)
 			.description(GENERAL_DESCRIPTION)
 			.imageUrl(GENERAL_IMAGEURL)
+			.isSoldOut(GENERAL_IS_SOLD_OUT)
 			.build();
 	}
 
@@ -35,6 +38,19 @@ public class MenuInfoFixture {
 			.price(GENERAL_PRICE)
 			.description(GENERAL_DESCRIPTION)
 			.imageUrl(GENERAL_IMAGEURL)
+			.isSoldOut(GENERAL_IS_SOLD_OUT)
+			.build();
+	}
+
+	public static MenuInfo CUSTOM_MENU_INFO(Long menuId, String menuName, int price, String description,
+		String imageUrl, boolean isSoldOut) {
+		return MenuInfo.builder()
+			.menuId(menuId)
+			.menuName(menuName)
+			.price(price)
+			.description(description)
+			.imageUrl(imageUrl)
+			.isSoldOut(isSoldOut)
 			.build();
 	}
 
@@ -45,6 +61,7 @@ public class MenuInfoFixture {
 			.price(requestMenuInfo.getPrice())
 			.description(requestMenuInfo.getDescription())
 			.imageUrl(requestMenuInfo.getImageUrl())
+			.isSoldOut(requestMenuInfo.isSoldOut())
 			.build();
 	}
 }

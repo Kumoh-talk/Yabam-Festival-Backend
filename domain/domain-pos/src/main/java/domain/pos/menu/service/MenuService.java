@@ -11,6 +11,7 @@ import domain.pos.menu.entity.Menu;
 import domain.pos.menu.entity.MenuInfo;
 import domain.pos.menu.implement.MenuCategoryValidator;
 import domain.pos.menu.implement.MenuReader;
+import domain.pos.menu.implement.MenuValidator;
 import domain.pos.menu.implement.MenuWriter;
 import domain.pos.store.implement.StoreReader;
 import domain.pos.store.implement.StoreValidator;
@@ -20,7 +21,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MenuService {
 	private final StoreValidator storeValidator;
+	private final MenuValidator menuValidator;
 	private final MenuCategoryValidator menuCategoryValidator;
+
 	private final StoreReader storeReader;
 	private final MenuReader menuReader;
 	private final MenuWriter menuWriter;
@@ -29,6 +32,13 @@ public class MenuService {
 		storeValidator.validateStoreOwner(storeId, userId);
 		menuCategoryValidator.validateMenuCategory(menuCategoryId);
 		return menuWriter.postMenu(storeId, userId, menuCategoryId, menuInfo);
+	}
+
+	public MenuInfo getMenuInfo(Long storeId, Long menuId) {
+		storeReader.readSingleStore(storeId)
+			.orElseThrow(() -> new ServiceException(ErrorCode.NOT_FOUND_STORE));
+		return menuReader.getMenuInfo(menuId)
+			.orElseThrow(() -> new ServiceException(ErrorCode.MENU_NOT_FOUND));
 	}
 
 	public Slice<MenuInfo> getMenuSlice(Pageable pageable, Long lastMenuId, Long storeId, Long menuCategoryId) {
@@ -44,4 +54,23 @@ public class MenuService {
 		return menuReader.getMenuSlice(pageable, lastMenuInfo, menuCategoryId);
 	}
 
+	public MenuInfo patchMenu(Long storeId, Long userId, MenuInfo patchMenuInfo) {
+		storeValidator.validateStoreOwner(storeId, userId);
+		menuValidator.validateMenu(patchMenuInfo.getMenuId());
+		return menuWriter.patchMenu(patchMenuInfo);
+		// TODO : 이미지 URI가 다르다면 이미지 삭제?
+	}
+
+	public MenuInfo patchMenuOrder(Long storeId, Long userId, Long menuCategoryId, Long menuId, int order) {
+		storeValidator.validateStoreOwner(storeId, userId);
+		menuValidator.validateMenu(menuId);
+		return menuWriter.patchMenuOrder(storeId, menuCategoryId, menuId, order);
+	}
+
+	public void deleteMenu(Long storeId, Long userId, Long menuCategoryId, Long menuId) {
+		storeValidator.validateStoreOwner(storeId, userId);
+		menuValidator.validateMenu(menuId);
+		menuWriter.deleteMenu(storeId, menuCategoryId, menuId);
+		// TODO : 이미지 삭제?
+	}
 }
