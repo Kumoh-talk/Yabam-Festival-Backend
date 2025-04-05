@@ -28,7 +28,7 @@ public class SaleService {
 
 	@Transactional
 	public Sale openStore(final UserPassport userPassport, final Long storeId) {
-		final Store previousStore = storeValidator.validateStoreModifyByUser(userPassport, storeId);
+		final Store previousStore = storeValidator.validateStoreByUser(userPassport, storeId);
 
 		if (previousStore.getIsOpen()) {
 			log.warn("가게 활성화 변경 실패: userId={}, storeId={}", userPassport.getUserId(), storeId);

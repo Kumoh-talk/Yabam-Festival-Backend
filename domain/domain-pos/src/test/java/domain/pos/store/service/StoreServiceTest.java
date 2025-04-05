@@ -139,7 +139,7 @@ class StoreServiceTest extends ServiceTest {
 			Store changedStore = CHANGED_GENERAL_STORE();
 
 			doReturn(nonChangedStore)
-				.when(storeValidator).validateStoreModifyByUser(queryUserPassport, queryStoreId);
+				.when(storeValidator).validateStoreByUser(queryUserPassport, queryStoreId);
 			doReturn(changedStore)
 				.when(storeWriter).updateStoreInfo(nonChangedStore, requestChangeStoreInfo);
 
@@ -153,7 +153,7 @@ class StoreServiceTest extends ServiceTest {
 			assertSoftly(softly -> {
 				softly.assertThat(result.getStoreId()).isEqualTo(changedStore.getStoreId());
 
-				verify(storeValidator).validateStoreModifyByUser(any(UserPassport.class), any(Long.class));
+				verify(storeValidator).validateStoreByUser(any(UserPassport.class), any(Long.class));
 				verify(storeWriter).updateStoreInfo(any(Store.class), any(StoreInfo.class));
 			});
 		}
@@ -166,7 +166,7 @@ class StoreServiceTest extends ServiceTest {
 			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
 
 			doThrow(new ServiceException(ErrorCode.NOT_VALID_OWNER))
-				.when(storeValidator).validateStoreModifyByUser(queryUserPassport, queryStoreId);
+				.when(storeValidator).validateStoreByUser(queryUserPassport, queryStoreId);
 
 			//when -> then
 			assertSoftly(softly -> {
@@ -178,7 +178,7 @@ class StoreServiceTest extends ServiceTest {
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_VALID_OWNER);
 				verify(storeValidator)
-					.validateStoreModifyByUser(any(UserPassport.class), any(Long.class));
+					.validateStoreByUser(any(UserPassport.class), any(Long.class));
 
 				verify(storeWriter, never())
 					.updateStoreInfo(any(Store.class), any(StoreInfo.class));
@@ -194,7 +194,7 @@ class StoreServiceTest extends ServiceTest {
 			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
 
 			doThrow(new ServiceException(ErrorCode.NOT_EQUAL_STORE_OWNER))
-				.when(storeValidator).validateStoreModifyByUser(diffOwnerUserPassport, queryStoreId);
+				.when(storeValidator).validateStoreByUser(diffOwnerUserPassport, queryStoreId);
 
 			// when -> then
 			assertSoftly(softly -> {
@@ -205,7 +205,7 @@ class StoreServiceTest extends ServiceTest {
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_EQUAL_STORE_OWNER);
 				verify(storeValidator)
-					.validateStoreModifyByUser(any(UserPassport.class), any(Long.class));
+					.validateStoreByUser(any(UserPassport.class), any(Long.class));
 				verify(storeWriter, never())
 					.updateStoreInfo(any(Store.class), any(StoreInfo.class));
 			});
@@ -220,7 +220,7 @@ class StoreServiceTest extends ServiceTest {
 			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
 
 			doThrow(new ServiceException(ErrorCode.NOT_FOUND_STORE))
-				.when(storeValidator).validateStoreModifyByUser(queryOwnerPassport, queryStoreId);
+				.when(storeValidator).validateStoreByUser(queryOwnerPassport, queryStoreId);
 
 			// when -> then
 			assertSoftly(softly -> {
@@ -233,7 +233,7 @@ class StoreServiceTest extends ServiceTest {
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_STORE);
 
 				verify(storeValidator)
-					.validateStoreModifyByUser(any(UserPassport.class), any(Long.class));
+					.validateStoreByUser(any(UserPassport.class), any(Long.class));
 				verify(storeWriter, never())
 					.updateStoreInfo(any(Store.class), any(StoreInfo.class));
 			});
@@ -251,7 +251,7 @@ class StoreServiceTest extends ServiceTest {
 			Store savedStore = GENERAL_STORE();
 
 			doReturn(savedStore)
-				.when(storeValidator).validateStoreModifyByUser(queryUserPassport, queryStoreId);
+				.when(storeValidator).validateStoreByUser(queryUserPassport, queryStoreId);
 
 			// when
 			storeService.deleteStore(queryUserPassport, queryStoreId);
@@ -259,7 +259,7 @@ class StoreServiceTest extends ServiceTest {
 			// then
 			assertSoftly(softly -> {
 				verify(storeValidator)
-					.validateStoreModifyByUser(any(UserPassport.class), any(Long.class));
+					.validateStoreByUser(any(UserPassport.class), any(Long.class));
 				verify(storeWriter)
 					.deleteStore(any(Store.class));
 			});
@@ -272,7 +272,7 @@ class StoreServiceTest extends ServiceTest {
 			Long queryStoreId = GENERAL_STORE().getStoreId();
 
 			doThrow(new ServiceException(ErrorCode.NOT_VALID_OWNER))
-				.when(storeValidator).validateStoreModifyByUser(queryOwnerPassport, queryStoreId);
+				.when(storeValidator).validateStoreByUser(queryOwnerPassport, queryStoreId);
 
 			// when -> then
 			assertSoftly(softly -> {
@@ -281,7 +281,7 @@ class StoreServiceTest extends ServiceTest {
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_VALID_OWNER);
 
 				verify(storeValidator)
-					.validateStoreModifyByUser(any(UserPassport.class), any(Long.class));
+					.validateStoreByUser(any(UserPassport.class), any(Long.class));
 				verify(storeWriter, never())
 					.deleteStore(any(Store.class));
 			});
@@ -294,7 +294,7 @@ class StoreServiceTest extends ServiceTest {
 			Long queryStoreId = GENERAL_STORE().getStoreId();
 
 			doThrow(new ServiceException(ErrorCode.NOT_FOUND_STORE))
-				.when(storeValidator).validateStoreModifyByUser(queryOwnerPassport, queryStoreId);
+				.when(storeValidator).validateStoreByUser(queryOwnerPassport, queryStoreId);
 
 			// when -> then
 			assertSoftly(softly -> {
@@ -303,7 +303,7 @@ class StoreServiceTest extends ServiceTest {
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_STORE);
 
 				verify(storeValidator)
-					.validateStoreModifyByUser(any(UserPassport.class), any(Long.class));
+					.validateStoreByUser(any(UserPassport.class), any(Long.class));
 				verify(storeWriter, never())
 					.deleteStore(any(Store.class));
 			});
@@ -316,7 +316,7 @@ class StoreServiceTest extends ServiceTest {
 			Long queryStoreId = GENERAL_STORE().getStoreId();
 
 			doThrow(new ServiceException(ErrorCode.NOT_EQUAL_STORE_OWNER))
-				.when(storeValidator).validateStoreModifyByUser(queryDiffOwnerPassport, queryStoreId);
+				.when(storeValidator).validateStoreByUser(queryDiffOwnerPassport, queryStoreId);
 
 			// when -> then
 			assertSoftly(softly -> {
@@ -325,7 +325,7 @@ class StoreServiceTest extends ServiceTest {
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_EQUAL_STORE_OWNER);
 
 				verify(storeValidator)
-					.validateStoreModifyByUser(any(UserPassport.class), any(Long.class));
+					.validateStoreByUser(any(UserPassport.class), any(Long.class));
 				verify(storeWriter, never())
 					.deleteStore(any(Store.class));
 			});

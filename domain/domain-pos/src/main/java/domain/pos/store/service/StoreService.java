@@ -53,7 +53,7 @@ public class StoreService {
 		final Long queryStoreId,
 		final StoreInfo requestChangeStoreInfo) {
 
-		final Store previousStore = storeValidator.validateStoreModifyByUser(userPassport, queryStoreId);
+		final Store previousStore = storeValidator.validateStoreByUser(userPassport, queryStoreId);
 		Store updatedStore = storeWriter
 			.updateStoreInfo(previousStore, requestChangeStoreInfo);
 		log.info("가게 정보 수정 성공 : userId={}, storeId={}", userPassport.getUserId(), queryStoreId);
@@ -62,7 +62,7 @@ public class StoreService {
 	}
 
 	public void deleteStore(final UserPassport userPassport, final Long storeId) {
-		final Store previousStore = storeValidator.validateStoreModifyByUser(userPassport, storeId);
+		final Store previousStore = storeValidator.validateStoreByUser(userPassport, storeId);
 		storeWriter.deleteStore(previousStore);
 		log.info("가게 삭제 성공 : userId={}, storeId={}", userPassport.getUserId(), storeId);
 	}

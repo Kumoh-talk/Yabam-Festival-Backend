@@ -25,7 +25,7 @@ public class StoreValidator {
 		}
 	}
 
-	public Store validateStoreModifyByUser(UserPassport userPassport, Long queryStoreId) {
+	public Store validateStoreByUser(UserPassport userPassport, Long queryStoreId) {
 		if (isOwner(userPassport)) {
 			log.warn("점주가 아닌 사용자의 요청으로 인한 실패: userId={}", userPassport.getUserId());
 			throw new ServiceException(ErrorCode.NOT_VALID_OWNER);
