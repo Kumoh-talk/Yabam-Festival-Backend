@@ -10,10 +10,19 @@ public class Table {
 	private final Boolean isActive;
 	private final Store store;
 
-	public Table(Long tableId, Integer tableNumber, Boolean isActive, Store store) {
+	private Table(Long tableId, Integer tableNumber, Boolean isActive, Store store) {
 		this.tableId = tableId;
 		this.tableNumber = tableNumber;
 		this.isActive = isActive;
 		this.store = store;
+	}
+
+	public static Table of(Long tableId, Integer tableNumber, Boolean isActive, Store store) {
+		return new Table(
+			tableId,
+			tableNumber,
+			isActive,
+			store
+		);
 	}
 }
