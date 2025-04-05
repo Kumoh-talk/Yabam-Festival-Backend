@@ -49,7 +49,8 @@ public class SecurityConfig {
 			.formLogin(ServerHttpSecurity.FormLoginSpec::disable)
 			.addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION) // JWT 인증 필터 추가
 			.addFilterBefore(new ExceptionHandlerFilter(), SecurityWebFiltersOrder.AUTHENTICATION) // 예외 처리 필터 추가
-			.addFilterAfter(new AuthenticationToHeaderFilter(serverSecurityContextRepository),
+			.addFilterAfter(
+				new AuthenticationToHeaderFilter(serverSecurityContextRepository, authenticationFailureHandler),
 				SecurityWebFiltersOrder.AUTHENTICATION) // 사용자 정보 헤더 추가 필터 추가
 			.authorizeExchange(exchange -> exchange
 				.anyExchange().authenticated()) // 모든 요청은 인증 필요

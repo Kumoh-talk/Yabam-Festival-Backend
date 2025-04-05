@@ -1,4 +1,4 @@
-package com.application.config.swagger;
+package com.application.global.config.swagger;
 
 import java.util.Arrays;
 import java.util.List;

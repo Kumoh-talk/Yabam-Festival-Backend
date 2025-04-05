@@ -1,7 +1,6 @@
 spring:
   application:
-    name:
-      yabam
+    name: yabam
   config:
     activate:
       on-profile: local
@@ -14,8 +13,7 @@ swagger:
 
 spring:
   application:
-    name:
-      yabam
+    name: yabam
   config:
     activate:
       on-profile: dev

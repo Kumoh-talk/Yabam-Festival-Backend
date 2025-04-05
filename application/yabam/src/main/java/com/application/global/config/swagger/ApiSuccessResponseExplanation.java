@@ -1,4 +1,4 @@
-package com.application.config.swagger;
+package com.application.global.config.swagger;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

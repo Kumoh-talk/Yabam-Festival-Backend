@@ -1,7 +1,7 @@
-bootJar{
+bootJar {
     enabled = true
 }
-jar{
+jar {
     enabled = false
 }
 
@@ -15,8 +15,6 @@ dependencies {
     // web
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-
-
     // config client
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
 
@@ -26,10 +24,14 @@ dependencies {
 
     // discovery client module
     implementation(project(':common:discovery-client'))
-
-    // common
+    // common module
     implementation(project(':common:base'))
+    // Domain module
+    implementation project(":domain:domain-pos")
 
     // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
+
+    // Bootstrap
+    implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
 }

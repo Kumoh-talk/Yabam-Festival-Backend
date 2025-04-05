@@ -50,7 +50,7 @@ public class JwtReactiveAuthenticationManager implements ReactiveAuthenticationM
 	}
 
 	private void validateAdminRole(JwtUserClaim claims) {
-		if (Role.ROLE_ADMIN.equals(claims.role())
+		if (Role.ROLE_ADMIN.equals(claims.userRole())
 			// TODO : RestTemplate 사용하여 admin인지 확인
 			&& !userRestTemplate.isAdmin(claims.userId())) {
 			throw new JwtAccessDeniedException();
