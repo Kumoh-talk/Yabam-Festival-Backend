@@ -70,6 +70,58 @@ class TableServiceTest extends ServiceTest {
 		}
 
 		@Test
+		void 실패_유효하지_않은_storeId() {
+			// given
+			UserPassport queryUserPassport = OWNER_USER_PASSPORT();
+			Long queryStoreId = 0L;
+			Integer queryTableNumber = 1;
+
+			doThrow(new ServiceException(ErrorCode.NOT_FOUND_STORE))
+				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(
+						() -> tableService.createTable(queryUserPassport, queryStoreId, queryTableNumber))
+					.isInstanceOf(ServiceException.class)
+					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_STORE);
+
+				verify(storeValidator)
+					.validateStoreOwner(queryUserPassport, queryStoreId);
+				verify(tableHandler, never())
+					.exitsTable(any(Store.class), anyInt());
+				verify(tableHandler, never())
+					.createTable(any(Store.class), anyInt());
+			});
+		}
+
+		@Test
+		void 실패_점주_주인과_요청유저가_불일치() {
+			// given
+			UserPassport queryUserPassport = OWNER_USER_PASSPORT();
+			Long queryStoreId = GENERAL_STORE().getStoreId();
+			Integer queryTableNumber = 1;
+
+			doThrow(new ServiceException(ErrorCode.NOT_EQUAL_STORE_OWNER))
+				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(
+						() -> tableService.createTable(queryUserPassport, queryStoreId, queryTableNumber))
+					.isInstanceOf(ServiceException.class)
+					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_EQUAL_STORE_OWNER);
+
+				verify(storeValidator)
+					.validateStoreOwner(queryUserPassport, queryStoreId);
+				verify(tableHandler, never())
+					.exitsTable(any(Store.class), anyInt());
+				verify(tableHandler, never())
+					.createTable(any(Store.class), anyInt());
+			});
+		}
+
+		@Test
 		void 실패_존재하는_테이블() {
 			// given
 			UserPassport queryUserPassport = OWNER_USER_PASSPORT();
