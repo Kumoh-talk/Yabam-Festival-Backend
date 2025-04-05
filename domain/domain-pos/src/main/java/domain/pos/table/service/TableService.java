@@ -24,7 +24,7 @@ public class TableService {
 		final Integer queryTableNumber) {
 		final Store store = storeValidator.validateStoreOwner(ownerPassport, queryStoreId);
 
-		tableHandler.exitsTable(store, queryTableNumber)
+		tableHandler.existsTable(store, queryTableNumber)
 			.ifPresent(table -> {
 				log.warn("존재하는 테이블 생성 에러 : storeId={}, tableNumber={}", queryStoreId, queryTableNumber);
 				throw new ServiceException(ErrorCode.EXIST_TABLE);

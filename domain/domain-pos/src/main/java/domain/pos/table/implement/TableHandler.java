@@ -18,7 +18,7 @@ public class TableHandler {
 		return tableRepository.createTable(responStore, queryTableNumber);
 	}
 
-	public Optional<Object> exitsTable(Store responStore, Integer queryTableNumber) {
+	public Optional<Object> existsTable(Store responStore, Integer queryTableNumber) {
 		return tableRepository.findTableByStoreAndTableNum(responStore, queryTableNumber);
 	}
 }

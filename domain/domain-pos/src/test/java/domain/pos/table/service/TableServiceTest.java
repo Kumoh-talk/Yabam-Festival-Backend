@@ -51,7 +51,7 @@ class TableServiceTest extends ServiceTest {
 			doReturn(responStore)
 				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
 			doReturn(Optional.empty())
-				.when(tableHandler).exitsTable(responStore, queryTableNumber);
+				.when(tableHandler).existsTable(responStore, queryTableNumber);
 			doReturn(createdTable)
 				.when(tableHandler).createTable(responStore, queryTableNumber);
 			// when
@@ -89,7 +89,7 @@ class TableServiceTest extends ServiceTest {
 				verify(storeValidator)
 					.validateStoreOwner(queryUserPassport, queryStoreId);
 				verify(tableHandler, never())
-					.exitsTable(any(Store.class), anyInt());
+					.existsTable(any(Store.class), anyInt());
 				verify(tableHandler, never())
 					.createTable(any(Store.class), anyInt());
 			});
@@ -115,7 +115,7 @@ class TableServiceTest extends ServiceTest {
 				verify(storeValidator)
 					.validateStoreOwner(queryUserPassport, queryStoreId);
 				verify(tableHandler, never())
-					.exitsTable(any(Store.class), anyInt());
+					.existsTable(any(Store.class), anyInt());
 				verify(tableHandler, never())
 					.createTable(any(Store.class), anyInt());
 			});
@@ -134,7 +134,7 @@ class TableServiceTest extends ServiceTest {
 			doReturn(responStore)
 				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
 			doReturn(Optional.of(createdTable))
-				.when(tableHandler).exitsTable(responStore, queryTableNumber);
+				.when(tableHandler).existsTable(responStore, queryTableNumber);
 
 			// when -> then
 			assertSoftly(softly -> {
@@ -146,7 +146,7 @@ class TableServiceTest extends ServiceTest {
 				verify(storeValidator)
 					.validateStoreOwner(queryUserPassport, queryStoreId);
 				verify(tableHandler)
-					.exitsTable(responStore, queryTableNumber);
+					.existsTable(responStore, queryTableNumber);
 				verify(tableHandler, never())
 					.createTable(responStore, queryTableNumber);
 			});
