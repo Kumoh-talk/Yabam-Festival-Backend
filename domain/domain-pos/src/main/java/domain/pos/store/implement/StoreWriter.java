@@ -24,4 +24,8 @@ public class StoreWriter {
 	public void deleteStore(Store previousStore) {
 		storeRepository.deleteStore(previousStore);
 	}
+
+	public Store modifyStoreOpenStatus(Store previousStore) {
+		return storeRepository.changeStoreOpenStatus(previousStore);
+	}
 }

@@ -14,4 +14,6 @@ public interface StoreRepository {
 	Store changeStoreInfo(Store previousStore, StoreInfo requestChangeStoreInfo);
 
 	void deleteStore(Store previousStore);
+
+	Store changeStoreOpenStatus(Store previousStore);
 }
