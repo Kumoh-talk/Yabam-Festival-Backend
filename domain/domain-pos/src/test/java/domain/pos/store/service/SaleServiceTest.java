@@ -55,7 +55,7 @@ class SaleServiceTest extends ServiceTest {
 			Sale createdSale = GENERAL_OPEN_SALE(opendStore);
 
 			doReturn(savedStore)
-				.when(storeValidator).validateStoreByUser(queryUserPassport, queryStoreId);
+				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
 			doReturn(opendStore)
 				.when(storeWriter).modifyStoreOpenStatus(savedStore);
 			doReturn(createdSale)
@@ -69,36 +69,12 @@ class SaleServiceTest extends ServiceTest {
 				softly.assertThat(result.getStore().getIsOpen()).isTrue();
 
 				verify(storeValidator)
-					.validateStoreByUser(any(UserPassport.class), anyLong());
+					.validateStoreOwner(any(UserPassport.class), anyLong());
 				verify(storeWriter)
 					.modifyStoreOpenStatus(any(Store.class));
 				verify(saleWriter)
 					.createSale(any(Store.class));
 			});
-		}
-
-		@Test
-		void 실패_요청_유저가_점주가_아닐때() {
-			// given
-			UserPassport queryUserPassport = GENERAL_USER_PASSPORT();
-			Long queryStoreId = GENERAL_USER_PASSPORT().getUserId();
-
-			doThrow(new ServiceException(ErrorCode.NOT_VALID_OWNER))
-				.when(storeValidator).validateStoreByUser(queryUserPassport, queryStoreId);
-
-			// when->then
-			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> saleService.openStore(queryUserPassport, queryStoreId))
-					.isInstanceOf(ServiceException.class)
-					.hasMessage(ErrorCode.NOT_VALID_OWNER.getMessage());
-				verify(storeValidator)
-					.validateStoreByUser(any(UserPassport.class), anyLong());
-				verify(storeWriter, never())
-					.modifyStoreOpenStatus(any(Store.class));
-				verify(saleWriter, never())
-					.createSale(any(Store.class));
-			});
-
 		}
 
 		@Test
@@ -108,7 +84,7 @@ class SaleServiceTest extends ServiceTest {
 			Long queryStoreId = GENERAL_USER_PASSPORT().getUserId();
 
 			doThrow(new ServiceException(ErrorCode.NOT_FOUND_STORE))
-				.when(storeValidator).validateStoreByUser(queryUserPassport, queryStoreId);
+				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
 
 			// when->then
 			assertSoftly(softly -> {
@@ -116,7 +92,7 @@ class SaleServiceTest extends ServiceTest {
 					.isInstanceOf(ServiceException.class)
 					.hasMessage(ErrorCode.NOT_FOUND_STORE.getMessage());
 				verify(storeValidator)
-					.validateStoreByUser(any(UserPassport.class), anyLong());
+					.validateStoreOwner(any(UserPassport.class), anyLong());
 				verify(storeWriter, never())
 					.modifyStoreOpenStatus(any(Store.class));
 				verify(saleWriter, never())
@@ -131,7 +107,7 @@ class SaleServiceTest extends ServiceTest {
 			Long queryStoreId = GENERAL_USER_PASSPORT().getUserId();
 
 			doThrow(new ServiceException(ErrorCode.NOT_EQUAL_STORE_OWNER))
-				.when(storeValidator).validateStoreByUser(queryUserPassport, queryStoreId);
+				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
 
 			// when->then
 			assertSoftly(softly -> {
@@ -139,7 +115,7 @@ class SaleServiceTest extends ServiceTest {
 					.isInstanceOf(ServiceException.class)
 					.hasMessage(ErrorCode.NOT_EQUAL_STORE_OWNER.getMessage());
 				verify(storeValidator)
-					.validateStoreByUser(any(UserPassport.class), anyLong());
+					.validateStoreOwner(any(UserPassport.class), anyLong());
 				verify(storeWriter, never())
 					.modifyStoreOpenStatus(any(Store.class));
 				verify(saleWriter, never())
@@ -155,7 +131,7 @@ class SaleServiceTest extends ServiceTest {
 			Long queryStoreId = savedStore.getStoreId();
 
 			doReturn(savedStore)
-				.when(storeValidator).validateStoreByUser(queryUserPassport, queryStoreId);
+				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
 
 			// when->then
 			assertSoftly(softly -> {
@@ -163,7 +139,7 @@ class SaleServiceTest extends ServiceTest {
 					.isInstanceOf(ServiceException.class)
 					.hasMessage(ErrorCode.CONFLICT_OPEN_STORE.getMessage());
 				verify(storeValidator)
-					.validateStoreByUser(any(UserPassport.class), anyLong());
+					.validateStoreOwner(any(UserPassport.class), anyLong());
 				verify(storeWriter, never())
 					.modifyStoreOpenStatus(any(Store.class));
 				verify(saleWriter, never())
@@ -209,25 +185,6 @@ class SaleServiceTest extends ServiceTest {
 					.closeSale(any(Sale.class), any(Store.class));
 			});
 
-		}
-
-		@Test
-		void 실패_점주가_아닌_USER() {
-			// given
-			UserPassport queryUserPassport = GENERAL_USER_PASSPORT();
-
-			// when->then
-			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> saleService.closeStore(queryUserPassport, 1L))
-					.isInstanceOf(ServiceException.class)
-					.hasMessage(ErrorCode.NOT_VALID_OWNER.getMessage());
-				verify(saleReader, never())
-					.readSingleSale(anyLong());
-				verify(storeWriter, never())
-					.modifyStoreOpenStatus(any(Store.class));
-				verify(saleWriter, never())
-					.closeSale(any(Sale.class), any(Store.class));
-			});
 		}
 
 		@Test

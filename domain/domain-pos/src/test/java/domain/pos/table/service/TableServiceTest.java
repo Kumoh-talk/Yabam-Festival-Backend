@@ -49,7 +49,7 @@ class TableServiceTest extends ServiceTest {
 			Table createdTable = GENERAL_IN_ACTIVE_TABLE(responStore);
 
 			doReturn(responStore)
-				.when(storeValidator).validateStoreByUser(queryUserPassport, queryStoreId);
+				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
 			doReturn(Optional.empty())
 				.when(tableHandler).exitsTable(responStore, queryTableNumber);
 			doReturn(createdTable)
@@ -64,7 +64,7 @@ class TableServiceTest extends ServiceTest {
 				softly.assertThat(resultTable.getStore().getStoreId()).isEqualTo(responStore.getStoreId());
 				softly.assertThat(resultTable.getStore().getStoreId()).isEqualTo(responStore.getStoreId());
 
-				verify(storeValidator).validateStoreByUser(queryUserPassport, queryStoreId);
+				verify(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
 				verify(tableHandler).createTable(responStore, queryTableNumber);
 			});
 		}
@@ -80,7 +80,7 @@ class TableServiceTest extends ServiceTest {
 			Table createdTable = GENERAL_IN_ACTIVE_TABLE(responStore);
 
 			doReturn(responStore)
-				.when(storeValidator).validateStoreByUser(queryUserPassport, queryStoreId);
+				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
 			doReturn(Optional.of(createdTable))
 				.when(tableHandler).exitsTable(responStore, queryTableNumber);
 
@@ -92,7 +92,7 @@ class TableServiceTest extends ServiceTest {
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.EXIST_TABLE);
 
 				verify(storeValidator)
-					.validateStoreByUser(queryUserPassport, queryStoreId);
+					.validateStoreOwner(queryUserPassport, queryStoreId);
 				verify(tableHandler)
 					.exitsTable(responStore, queryTableNumber);
 				verify(tableHandler, never())

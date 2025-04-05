@@ -20,9 +20,9 @@ public class TableService {
 	private final StoreValidator storeValidator;
 	private final TableHandler tableHandler;
 
-	public Table createTable(final UserPassport queryUserPassport, final Long queryStoreId,
+	public Table createTable(final UserPassport ownerPassport, final Long queryStoreId,
 		final Integer queryTableNumber) {
-		final Store store = storeValidator.validateStoreByUser(queryUserPassport, queryStoreId);
+		final Store store = storeValidator.validateStoreOwner(ownerPassport, queryStoreId);
 
 		tableHandler.exitsTable(store, queryTableNumber)
 			.ifPresent(table -> {
