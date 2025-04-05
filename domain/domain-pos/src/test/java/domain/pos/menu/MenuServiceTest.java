@@ -71,7 +71,7 @@ public class MenuServiceTest extends ServiceTest {
 		void 메뉴_생성_성공() {
 			// given
 			StoreInfo storeInfo = GENERAL_STORE_INFO();
-			MenuCategory menuCategory = CUSTOM_MENU_CATEGORY(menuCategoryId);
+			MenuCategory menuCategory = CUSTOM_MENU_CATEGORY(menuCategoryId, storeId);
 			Menu menu = CUSTOM_MENU(REQUEST_TO_ENTITY(menuId, requestMenuInfo), storeInfo, menuCategory);
 
 			BDDMockito.given(menuWriter.postMenu(storeId, userId, menuCategoryId, requestMenuInfo))
