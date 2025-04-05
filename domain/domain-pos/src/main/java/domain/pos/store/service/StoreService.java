@@ -6,7 +6,6 @@ import com.exception.ErrorCode;
 import com.exception.ServiceException;
 
 import domain.pos.member.entity.UserPassport;
-import domain.pos.member.entity.UserRole;
 import domain.pos.store.entity.Store;
 import domain.pos.store.entity.StoreInfo;
 import domain.pos.store.implement.StoreReader;
@@ -23,20 +22,10 @@ public class StoreService {
 	private final StoreReader storeReader;
 	private final StoreValidator storeValidator;
 
-	public Long createStore(final UserPassport userPassport, final StoreInfo createRequestStoreInfo) {
-		if (isOwner(userPassport)) {
-			log.warn("점주가 아닌 사용자의 요청으로 인한 실패: userId={}", userPassport.getUserId());
-			throw new ServiceException(ErrorCode.NOT_VALID_OWNER);
-		}
-
-		final Long savedStoreId = storeWriter.createStore(userPassport, createRequestStoreInfo);
-		log.info("가게 생성 성공 : userId={}, storeId={}", userPassport.getUserId(), savedStoreId);
+	public Long createStore(final UserPassport ownerPassport, final StoreInfo createRequestStoreInfo) {
+		final Long savedStoreId = storeWriter.createStore(ownerPassport, createRequestStoreInfo);
+		log.info("가게 생성 성공 : userId={}, storeId={}", ownerPassport.getUserId(), savedStoreId);
 		return savedStoreId;
-	}
-
-	// 점주가 아닌 사용자인지 확인
-	private boolean isOwner(UserPassport userPassport) {
-		return !userPassport.getUserRole().equals(UserRole.ROLE_OWNER);
 	}
 
 	public Store findStore(final Long storeId) {
@@ -49,21 +38,21 @@ public class StoreService {
 	}
 
 	public Store updateStoreInfo(
-		final UserPassport userPassport,
+		final UserPassport ownerPassport,
 		final Long queryStoreId,
 		final StoreInfo requestChangeStoreInfo) {
 
-		final Store previousStore = storeValidator.validateStoreModifyByUser(userPassport, queryStoreId);
+		final Store previousStore = storeValidator.validateStoreOwner(ownerPassport, queryStoreId);
 		Store updatedStore = storeWriter
 			.updateStoreInfo(previousStore, requestChangeStoreInfo);
-		log.info("가게 정보 수정 성공 : userId={}, storeId={}", userPassport.getUserId(), queryStoreId);
+		log.info("가게 정보 수정 성공 : userId={}, storeId={}", ownerPassport.getUserId(), queryStoreId);
 
 		return updatedStore;
 	}
 
-	public void deleteStore(final UserPassport userPassport, final Long storeId) {
-		final Store previousStore = storeValidator.validateStoreModifyByUser(userPassport, storeId);
+	public void deleteStore(final UserPassport ownerPassport, final Long storeId) {
+		final Store previousStore = storeValidator.validateStoreOwner(ownerPassport, storeId);
 		storeWriter.deleteStore(previousStore);
-		log.info("가게 삭제 성공 : userId={}, storeId={}", userPassport.getUserId(), storeId);
+		log.info("가게 삭제 성공 : userId={}, storeId={}", ownerPassport.getUserId(), storeId);
 	}
 }
