@@ -9,4 +9,8 @@ public interface TableRepository {
 	Table createTable(Store responStore, Integer queryTableNumber);
 
 	Optional<Object> findTableByStoreAndTableNum(Store responStore, Integer queryTableNumber);
+
+	Optional<Table> findById(Long queryTableId);
+
+	Table changeTableActiveStatus(boolean isActive, Table savedInActiveTable);
 }
