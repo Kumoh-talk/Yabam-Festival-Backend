@@ -115,9 +115,9 @@ public class MenuCategoryServiceTest extends ServiceTest {
 	@Nested
 	@DisplayName("메뉴 카테고리 리스트 조회")
 	class getMenuCategoryList {
-		private final Long menuCategoryId = MENU_CATEGORY_ID;
-		private final String categoryName = CATEGORY_NAME;
-		private final Long storeId = STORE_ID;
+		private final Long menuCategoryId = GENERAL_MENU_CATEGORY_ID;
+		private final String categoryName = GENERAL_CATEGORY_NAME;
+		private final Long storeId = GENERAL_STORE_ID;
 
 		@Test
 		void 메뉴_카테고리_리스트_조회_성공() {

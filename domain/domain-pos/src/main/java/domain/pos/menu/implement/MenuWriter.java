@@ -21,8 +21,8 @@ public class MenuWriter {
 		return menuRepository.patchMenu(patchMenuInfo);
 	}
 
-	public MenuInfo patchMenuOrder(Long storeId, Long menuCategoryId, Long menuId, int order) {
-		return menuRepository.patchMenuOrder(storeId, menuCategoryId, menuId, order);
+	public MenuInfo patchMenuOrder(Long storeId, Long menuCategoryId, Long menuId, int patchOrder) {
+		return menuRepository.patchMenuOrder(storeId, menuCategoryId, menuId, patchOrder);
 	}
 
 	public void deleteMenu(Long storeId, Long menuCategoryId, Long menuId) {

@@ -21,7 +21,7 @@ public interface MenuRepository {
 	MenuInfo patchMenu(MenuInfo patchMenuInfo);
 
 	// TODO : Infra 계층 구현 시 동일 가게, 동일 카테고리 내에 지정 order 이상인 메뉴들은 ++order 하도록 구현
-	MenuInfo patchMenuOrder(Long storeId, Long menuCategoryId, Long menuId, int order);
+	MenuInfo patchMenuOrder(Long storeId, Long menuCategoryId, Long menuId, int patchOrder);
 
 	// TODO : Infra 계층 구현 시 동일 가게, 동일 카테고리 내에 삭제 메뉴 order 초과인 메뉴들은 --order 하도록 구현
 	void deleteMenu(Long storeId, Long menuCategoryId, Long menuId);

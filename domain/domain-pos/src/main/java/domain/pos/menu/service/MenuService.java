@@ -62,10 +62,10 @@ public class MenuService {
 	}
 
 	public MenuInfo patchMenuOrder(Long storeId, UserPassport userPassport, Long menuCategoryId, Long menuId,
-		int order) {
+		int patchOrder) {
 		storeValidator.validateStoreOwner(userPassport, storeId);
 		menuValidator.validateMenu(menuId);
-		return menuWriter.patchMenuOrder(storeId, menuCategoryId, menuId, order);
+		return menuWriter.patchMenuOrder(storeId, menuCategoryId, menuId, patchOrder);
 	}
 
 	public void deleteMenu(Long storeId, UserPassport userPassport, Long menuCategoryId, Long menuId) {
