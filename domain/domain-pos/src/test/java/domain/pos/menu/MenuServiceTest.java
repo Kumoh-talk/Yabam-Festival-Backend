@@ -1,6 +1,5 @@
 package domain.pos.menu;
 
-import static fixtures.member.OwnerFixture.*;
 import static fixtures.member.UserFixture.*;
 import static fixtures.menu.MenuCategoryFixture.*;
 import static fixtures.menu.MenuFixture.*;
@@ -71,7 +70,7 @@ public class MenuServiceTest extends ServiceTest {
 		@Test
 		void 메뉴_생성_성공() {
 			// given
-			Store store = CUSTOM_STORE(storeId, GENERAL_STORE_INFO(), GENERAL_OWNER());
+			Store store = CUSTOM_STORE(storeId, GENERAL_STORE_INFO(), OWNER_USER_PASSPORT());
 			MenuCategory menuCategory = CUSTOM_MENU_CATEGORY(menuCategoryId, storeId);
 			Menu menu = CUSTOM_MENU(REQUEST_TO_ENTITY(menuId, requestMenuInfo), store, menuCategory);
 
@@ -172,7 +171,7 @@ public class MenuServiceTest extends ServiceTest {
 		@Test
 		void 메뉴_단일_조회_성공() {
 			// given
-			Store store = CUSTOM_STORE(storeId, GENERAL_STORE_INFO(), GENERAL_OWNER());
+			Store store = CUSTOM_STORE(storeId, GENERAL_STORE_INFO(), OWNER_USER_PASSPORT());
 			MenuInfo menuInfo = GENERAL_MENU_INFO();
 
 			BDDMockito.given(storeReader.readSingleStore(storeId))
@@ -210,7 +209,7 @@ public class MenuServiceTest extends ServiceTest {
 		@Test
 		void 메뉴_조회_실패() {
 			// given
-			Store store = CUSTOM_STORE(storeId, GENERAL_STORE_INFO(), GENERAL_OWNER());
+			Store store = CUSTOM_STORE(storeId, GENERAL_STORE_INFO(), OWNER_USER_PASSPORT());
 			BDDMockito.given(storeReader.readSingleStore(any(Long.class)))
 				.willReturn(Optional.of(store));
 			BDDMockito.given(menuReader.getMenuInfo(any(Long.class)))
@@ -242,7 +241,7 @@ public class MenuServiceTest extends ServiceTest {
 		@Test
 		void 메뉴_리스트_조회_성공() {
 			// given
-			Store store = CUSTOM_STORE(storeId, GENERAL_STORE_INFO(), GENERAL_OWNER());
+			Store store = CUSTOM_STORE(storeId, GENERAL_STORE_INFO(), OWNER_USER_PASSPORT());
 			MenuInfo lastMenuInfo = GENERAL_MENU_INFO();
 			MenuInfo nextMenuInfo = CUSTOM_MENU_INFO(lastMenuId + 1, GENERAL_SORT_ORDER + 1,
 				GENERAL_MENU_NAME, GENERAL_PRICE, GENERAL_DESCRIPTION, GENERAL_IMAGE_URL, GENERAL_IS_SOLD_OUT);
@@ -293,7 +292,7 @@ public class MenuServiceTest extends ServiceTest {
 		@Test
 		void 카테고리_조회_실패() {
 			// given
-			Store store = CUSTOM_STORE(storeId, GENERAL_STORE_INFO(), GENERAL_OWNER());
+			Store store = CUSTOM_STORE(storeId, GENERAL_STORE_INFO(), OWNER_USER_PASSPORT());
 			BDDMockito.given(storeReader.readSingleStore(any(Long.class)))
 				.willReturn(Optional.of(store));
 
@@ -321,7 +320,7 @@ public class MenuServiceTest extends ServiceTest {
 		@Test
 		void 메뉴_조회_실패() {
 			// given
-			Store store = CUSTOM_STORE(storeId, GENERAL_STORE_INFO(), GENERAL_OWNER());
+			Store store = CUSTOM_STORE(storeId, GENERAL_STORE_INFO(), OWNER_USER_PASSPORT());
 			BDDMockito.given(storeReader.readSingleStore(any(Long.class)))
 				.willReturn(Optional.of(store));
 			BDDMockito.given(menuReader.getMenuInfo(any(Long.class)))

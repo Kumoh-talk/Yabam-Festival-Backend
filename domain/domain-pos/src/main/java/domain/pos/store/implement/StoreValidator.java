@@ -32,6 +32,6 @@ public class StoreValidator {
 
 	// 가게 소유자와 요청 점주가 같은지 확인
 	private boolean isEqualSavedStoreOwnerAndQueryOwner(Long ownerId, Store previousStore) {
-		return !previousStore.getStoreOwner().getOwnerId().equals(ownerId);
+		return !previousStore.getOwnerPassport().getUserId().equals(ownerId);
 	}
 }
