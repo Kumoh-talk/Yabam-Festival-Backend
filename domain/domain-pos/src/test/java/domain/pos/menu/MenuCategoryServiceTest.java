@@ -1,5 +1,6 @@
 package domain.pos.menu;
 
+import static fixtures.member.UserFixture.*;
 import static fixtures.menu.MenuCategoryFixture.*;
 import static fixtures.store.StoreFixture.*;
 import static org.assertj.core.api.SoftAssertions.*;
@@ -19,6 +20,7 @@ import com.exception.ErrorCode;
 import com.exception.ServiceException;
 
 import base.ServiceTest;
+import domain.pos.member.entity.UserPassport;
 import domain.pos.menu.entity.MenuCategory;
 import domain.pos.menu.implement.MenuCategoryReader;
 import domain.pos.menu.implement.MenuCategoryValidator;
@@ -45,7 +47,7 @@ public class MenuCategoryServiceTest extends ServiceTest {
 	@DisplayName("메뉴 카테고리 생성")
 	class postMenuCategory {
 		private final Long storeId = 1L;
-		private final Long userId = 2L;
+		private final UserPassport userPassport = OWNER_USER_PASSPORT();
 		private final String categoryName = "categoryName";
 
 		private final Long menuCategoryId = 1L;
@@ -59,7 +61,8 @@ public class MenuCategoryServiceTest extends ServiceTest {
 				.willReturn(menuCategory);
 
 			// when
-			MenuCategory serviceMenuCategory = menuCategoryService.postMenuCategory(storeId, userId, categoryName);
+			MenuCategory serviceMenuCategory = menuCategoryService.postMenuCategory(storeId, userPassport,
+				categoryName);
 
 			// then
 			assertSoftly(softly -> {
@@ -73,15 +76,16 @@ public class MenuCategoryServiceTest extends ServiceTest {
 			// given
 			doThrow(new ServiceException(ErrorCode.NOT_FOUND_STORE))
 				.when(storeValidator)
-				.validateStoreOwner(storeId, userId);
+				.validateStoreOwner(userPassport, storeId);
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> menuCategoryService.postMenuCategory(storeId, userId, categoryName))
+				softly.assertThatThrownBy(
+						() -> menuCategoryService.postMenuCategory(storeId, userPassport, categoryName))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_STORE);
 				verify(storeValidator)
-					.validateStoreOwner(storeId, userId);
+					.validateStoreOwner(userPassport, storeId);
 				verify(menuCategoryWriter, never())
 					.postMenuCategory(storeId, categoryName);
 			});
@@ -92,15 +96,16 @@ public class MenuCategoryServiceTest extends ServiceTest {
 			// given
 			doThrow(new ServiceException(ErrorCode.NOT_EQUAL_STORE_OWNER))
 				.when(storeValidator)
-				.validateStoreOwner(storeId, userId);
+				.validateStoreOwner(userPassport, storeId);
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> menuCategoryService.postMenuCategory(storeId, userId, categoryName))
+				softly.assertThatThrownBy(
+						() -> menuCategoryService.postMenuCategory(storeId, userPassport, categoryName))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_EQUAL_STORE_OWNER);
 				verify(storeValidator)
-					.validateStoreOwner(storeId, userId);
+					.validateStoreOwner(userPassport, storeId);
 				verify(menuCategoryWriter, never())
 					.postMenuCategory(storeId, categoryName);
 			});
@@ -158,7 +163,7 @@ public class MenuCategoryServiceTest extends ServiceTest {
 	@DisplayName("메뉴 카테고리 수정")
 	class patchMenuCategory {
 		private final Long storeId = 1L;
-		private final Long userId = 2L;
+		private final UserPassport userPassport = OWNER_USER_PASSPORT();
 		private final Long categoryId = 3L;
 		private final String categoryName = "categoryName";
 
@@ -171,7 +176,7 @@ public class MenuCategoryServiceTest extends ServiceTest {
 				.willReturn(menuCategory);
 
 			// when
-			MenuCategory serviceMenuCategory = menuCategoryService.patchMenuCategory(storeId, userId, categoryId,
+			MenuCategory serviceMenuCategory = menuCategoryService.patchMenuCategory(storeId, userPassport, categoryId,
 				categoryName);
 
 			// then
@@ -187,16 +192,16 @@ public class MenuCategoryServiceTest extends ServiceTest {
 			// given
 			doThrow(new ServiceException(ErrorCode.NOT_FOUND_STORE))
 				.when(storeValidator)
-				.validateStoreOwner(storeId, userId);
+				.validateStoreOwner(userPassport, storeId);
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> menuCategoryService.patchMenuCategory(storeId, userId, categoryId,
+				softly.assertThatThrownBy(() -> menuCategoryService.patchMenuCategory(storeId, userPassport, categoryId,
 						categoryName))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_STORE);
 				verify(storeValidator)
-					.validateStoreOwner(storeId, userId);
+					.validateStoreOwner(userPassport, storeId);
 				verify(menuCategoryValidator, never())
 					.validateMenuCategory(categoryId);
 				verify(menuCategoryWriter, never())
@@ -209,16 +214,16 @@ public class MenuCategoryServiceTest extends ServiceTest {
 			// given
 			doThrow(new ServiceException(ErrorCode.NOT_EQUAL_STORE_OWNER))
 				.when(storeValidator)
-				.validateStoreOwner(storeId, userId);
+				.validateStoreOwner(userPassport, storeId);
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> menuCategoryService.patchMenuCategory(storeId, userId, categoryId,
+				softly.assertThatThrownBy(() -> menuCategoryService.patchMenuCategory(storeId, userPassport, categoryId,
 						categoryName))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_EQUAL_STORE_OWNER);
 				verify(storeValidator)
-					.validateStoreOwner(storeId, userId);
+					.validateStoreOwner(userPassport, storeId);
 				verify(menuCategoryValidator, never())
 					.validateMenuCategory(categoryId);
 				verify(menuCategoryWriter, never())
@@ -235,12 +240,12 @@ public class MenuCategoryServiceTest extends ServiceTest {
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> menuCategoryService.patchMenuCategory(storeId, userId, categoryId,
+				softly.assertThatThrownBy(() -> menuCategoryService.patchMenuCategory(storeId, userPassport, categoryId,
 						categoryName))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.MENU_CATEGORY_NOT_FOUND);
 				verify(storeValidator)
-					.validateStoreOwner(storeId, userId);
+					.validateStoreOwner(userPassport, storeId);
 				verify(menuCategoryValidator)
 					.validateMenuCategory(categoryId);
 				verify(menuCategoryWriter, never())
@@ -253,13 +258,13 @@ public class MenuCategoryServiceTest extends ServiceTest {
 	@DisplayName("메뉴 카테고리 삭제")
 	class deleteMenuCategory {
 		private final Long storeId = 1L;
-		private final Long userId = 2L;
+		private final UserPassport userPassport = OWNER_USER_PASSPORT();
 		private final Long categoryId = 3L;
 
 		@Test
 		void 메뉴_카테고리_삭제_성공() {
 			// when
-			menuCategoryService.deleteMenuCategory(storeId, userId, categoryId);
+			menuCategoryService.deleteMenuCategory(storeId, userPassport, categoryId);
 
 			// then
 			verify(menuCategoryWriter)
@@ -272,15 +277,16 @@ public class MenuCategoryServiceTest extends ServiceTest {
 			// given
 			doThrow(new ServiceException(ErrorCode.NOT_FOUND_STORE))
 				.when(storeValidator)
-				.validateStoreOwner(storeId, userId);
+				.validateStoreOwner(userPassport, storeId);
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> menuCategoryService.deleteMenuCategory(storeId, userId, categoryId))
+				softly.assertThatThrownBy(
+						() -> menuCategoryService.deleteMenuCategory(storeId, userPassport, categoryId))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_STORE);
 				verify(storeValidator)
-					.validateStoreOwner(storeId, userId);
+					.validateStoreOwner(userPassport, storeId);
 				verify(menuCategoryValidator, never())
 					.validateMenuCategory(categoryId);
 				verify(menuCategoryWriter, never())
@@ -293,15 +299,16 @@ public class MenuCategoryServiceTest extends ServiceTest {
 			// given
 			doThrow(new ServiceException(ErrorCode.NOT_EQUAL_STORE_OWNER))
 				.when(storeValidator)
-				.validateStoreOwner(storeId, userId);
+				.validateStoreOwner(userPassport, storeId);
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> menuCategoryService.deleteMenuCategory(storeId, userId, categoryId))
+				softly.assertThatThrownBy(
+						() -> menuCategoryService.deleteMenuCategory(storeId, userPassport, categoryId))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_EQUAL_STORE_OWNER);
 				verify(storeValidator)
-					.validateStoreOwner(storeId, userId);
+					.validateStoreOwner(userPassport, storeId);
 				verify(menuCategoryValidator, never())
 					.validateMenuCategory(categoryId);
 				verify(menuCategoryWriter, never())
@@ -318,11 +325,12 @@ public class MenuCategoryServiceTest extends ServiceTest {
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> menuCategoryService.deleteMenuCategory(storeId, userId, categoryId))
+				softly.assertThatThrownBy(
+						() -> menuCategoryService.deleteMenuCategory(storeId, userPassport, categoryId))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.MENU_CATEGORY_NOT_FOUND);
 				verify(storeValidator)
-					.validateStoreOwner(storeId, userId);
+					.validateStoreOwner(userPassport, storeId);
 				verify(menuCategoryValidator)
 					.validateMenuCategory(categoryId);
 				verify(menuCategoryWriter, never())

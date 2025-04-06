@@ -1,6 +1,7 @@
 package domain.pos.menu;
 
 import static fixtures.member.OwnerFixture.*;
+import static fixtures.member.UserFixture.*;
 import static fixtures.menu.MenuCategoryFixture.*;
 import static fixtures.menu.MenuFixture.*;
 import static fixtures.menu.MenuInfoFixture.*;
@@ -28,6 +29,7 @@ import com.exception.ErrorCode;
 import com.exception.ServiceException;
 
 import base.ServiceTest;
+import domain.pos.member.entity.UserPassport;
 import domain.pos.menu.entity.Menu;
 import domain.pos.menu.entity.MenuCategory;
 import domain.pos.menu.entity.MenuInfo;
@@ -61,7 +63,7 @@ public class MenuServiceTest extends ServiceTest {
 	@DisplayName("메뉴 생성")
 	class postMenu {
 		private final Long storeId = 1L;
-		private final Long userId = 2L;
+		private final UserPassport userPassport = OWNER_USER_PASSPORT();
 		private final Long menuCategoryId = 3L;
 		private final MenuInfo requestMenuInfo = REQUEST_MENU_INFO();
 
@@ -74,11 +76,11 @@ public class MenuServiceTest extends ServiceTest {
 			MenuCategory menuCategory = CUSTOM_MENU_CATEGORY(menuCategoryId, storeId);
 			Menu menu = CUSTOM_MENU(REQUEST_TO_ENTITY(menuId, requestMenuInfo), storeInfo, menuCategory);
 
-			BDDMockito.given(menuWriter.postMenu(storeId, userId, menuCategoryId, requestMenuInfo))
+			BDDMockito.given(menuWriter.postMenu(storeId, userPassport, menuCategoryId, requestMenuInfo))
 				.willReturn(menu);
 
 			// when
-			Menu serviceMenu = menuService.postMenu(storeId, userId, menuCategoryId, requestMenuInfo);
+			Menu serviceMenu = menuService.postMenu(storeId, userPassport, menuCategoryId, requestMenuInfo);
 
 			// then
 			assertSoftly(softly -> {
@@ -103,19 +105,20 @@ public class MenuServiceTest extends ServiceTest {
 			// given
 			doThrow(new ServiceException(ErrorCode.NOT_FOUND_STORE))
 				.when(storeValidator)
-				.validateStoreOwner(storeId, userId);
+				.validateStoreOwner(userPassport, storeId);
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> menuService.postMenu(storeId, userId, menuCategoryId, requestMenuInfo))
+				softly.assertThatThrownBy(
+						() -> menuService.postMenu(storeId, userPassport, menuCategoryId, requestMenuInfo))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_STORE);
 				verify(storeValidator)
-					.validateStoreOwner(storeId, userId);
+					.validateStoreOwner(userPassport, storeId);
 				verify(menuCategoryValidator, never())
 					.validateMenuCategory(menuCategoryId);
 				verify(menuWriter, never())
-					.postMenu(storeId, userId, menuCategoryId, requestMenuInfo);
+					.postMenu(storeId, userPassport, menuCategoryId, requestMenuInfo);
 			});
 		}
 
@@ -124,19 +127,20 @@ public class MenuServiceTest extends ServiceTest {
 			// given
 			doThrow(new ServiceException(ErrorCode.NOT_EQUAL_STORE_OWNER))
 				.when(storeValidator)
-				.validateStoreOwner(storeId, userId);
+				.validateStoreOwner(userPassport, storeId);
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> menuService.postMenu(storeId, userId, menuCategoryId, requestMenuInfo))
+				softly.assertThatThrownBy(
+						() -> menuService.postMenu(storeId, userPassport, menuCategoryId, requestMenuInfo))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_EQUAL_STORE_OWNER);
 				verify(storeValidator)
-					.validateStoreOwner(storeId, userId);
+					.validateStoreOwner(userPassport, storeId);
 				verify(menuCategoryValidator, never())
 					.validateMenuCategory(menuCategoryId);
 				verify(menuWriter, never())
-					.postMenu(storeId, userId, menuCategoryId, requestMenuInfo);
+					.postMenu(storeId, userPassport, menuCategoryId, requestMenuInfo);
 			});
 		}
 
@@ -149,15 +153,16 @@ public class MenuServiceTest extends ServiceTest {
 
 			// when -> then
 			assertSoftly(softly -> {
-				softly.assertThatThrownBy(() -> menuService.postMenu(storeId, userId, menuCategoryId, requestMenuInfo))
+				softly.assertThatThrownBy(
+						() -> menuService.postMenu(storeId, userPassport, menuCategoryId, requestMenuInfo))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.MENU_CATEGORY_NOT_FOUND);
 				verify(storeValidator)
-					.validateStoreOwner(storeId, userId);
+					.validateStoreOwner(userPassport, storeId);
 				verify(menuCategoryValidator)
 					.validateMenuCategory(menuCategoryId);
 				verify(menuWriter, never())
-					.postMenu(storeId, userId, menuCategoryId, requestMenuInfo);
+					.postMenu(storeId, userPassport, menuCategoryId, requestMenuInfo);
 			});
 		}
 	}
@@ -288,7 +293,7 @@ public class MenuServiceTest extends ServiceTest {
 		private final boolean patchIsSoldOut = false;
 
 		private final Long storeId = 1L;
-		private final Long userId = 2L;
+		private final UserPassport userPassport = OWNER_USER_PASSPORT();
 		private final Long menuId = 3L;
 		private final MenuInfo patchMenuInfo = CUSTOM_MENU_INFO(menuId, patchMenuName, patchPrice, patchDescription,
 			patchImageUrl,
@@ -304,7 +309,7 @@ public class MenuServiceTest extends ServiceTest {
 				.willReturn(patchMenuInfo);
 
 			// when
-			MenuInfo servicePatchMenuInfo = menuService.patchMenu(storeId, userId, patchMenuInfo);
+			MenuInfo servicePatchMenuInfo = menuService.patchMenu(storeId, userPassport, patchMenuInfo);
 
 			// then
 			assertSoftly(softly -> {
@@ -321,14 +326,14 @@ public class MenuServiceTest extends ServiceTest {
 	@DisplayName("메뉴 삭제")
 	class deleteMenu {
 		private final Long storeId = 1L;
-		private final Long userId = 2L;
+		private final UserPassport userPassport = OWNER_USER_PASSPORT();
 		private final Long menuCategoryId = 3L;
 		private final Long menuId = 4L;
 
 		@Test
 		void 메뉴_삭제_성공() {
 			// when
-			menuService.deleteMenu(storeId, userId, menuCategoryId, menuId);
+			menuService.deleteMenu(storeId, userPassport, menuCategoryId, menuId);
 
 			// then
 			verify(menuWriter)

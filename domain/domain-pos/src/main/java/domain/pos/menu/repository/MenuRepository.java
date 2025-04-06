@@ -5,12 +5,13 @@ import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
+import domain.pos.member.entity.UserPassport;
 import domain.pos.menu.entity.Menu;
 import domain.pos.menu.entity.MenuInfo;
 
 public interface MenuRepository {
 	// TODO : 존재하는 order 값이라면 order 이상 메뉴들의 order+1
-	Menu postMenu(Long storeId, Long userId, Long menuCategoryId, MenuInfo menuInfo);
+	Menu postMenu(Long storeId, UserPassport userPassport, Long menuCategoryId, MenuInfo menuInfo);
 
 	Optional<MenuInfo> getMenuInfo(Long menuId);
 

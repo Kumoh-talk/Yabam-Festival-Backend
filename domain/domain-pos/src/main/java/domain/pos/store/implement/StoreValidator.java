@@ -16,14 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 public class StoreValidator {
 	private final StoreReader storeReader;
 
-	public void validateStoreOwner(Long storeId, Long userId) {
-		Store store = storeReader.readSingleStore(storeId)
-			.orElseThrow(() -> new ServiceException(ErrorCode.NOT_FOUND_STORE));
-		if (!store.getStoreOwner().getOwnerId().equals(userId)) {
-			throw new ServiceException(ErrorCode.NOT_EQUAL_STORE_OWNER);
-		}
-	}
-
 	public Store validateStoreOwner(UserPassport ownerPassport, Long queryStoreId) {
 		final Store previousStore = storeReader.readSingleStore(queryStoreId)
 			.orElseThrow(() -> {
