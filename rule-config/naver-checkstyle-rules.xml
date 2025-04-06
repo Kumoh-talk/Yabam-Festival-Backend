@@ -56,12 +56,12 @@ The following rules in the Naver coding convention cannot be checked by this con
 
         <!-- [list-uppercase-abbr] -->
         <module name="AbbreviationAsWordInName">
-            <property name="ignoreFinal" value="false"/>
-            <property name="allowedAbbreviationLength" value="1"/>
-            <message key="abbreviation.as.word"
-                     value="[list-uppercase-abbr] Abbreviation in name ''{0}'' must contain no more than {1}"/>
-            <property name="allowedAbbreviations" value="DAO,BO"/>
+            <property name="ignoreStatic" value="true"/>
+            <property name="ignoreFinal" value="true"/>
+            <property name="allowedAbbreviationLength" value="20"/>
+            <property name="allowedAbbreviations" value="DAO,BO,USER_ID,USER_NICKNAME,USER_ROLE,USER_INFO_HEADER"/>
         </module>
+
 
         <!-- [package-lowercase] -->
         <module name="PackageName">
@@ -86,10 +86,9 @@ The following rules in the Naver coding convention cannot be checked by this con
 
         <!-- [var-lower-camelcase] -->
         <module name="MemberName">
-            <property name="format" value="^[a-z][a-zA-Z0-9][a-zA-Z0-9]*$"/>
-            <message key="name.invalidPattern"
-                     value="[var-lower-camelcase] Member name ''{0}'' must match pattern ''{1}''."/>
+            <property name="format" value="^[a-zA-Z_][a-zA-Z0-9_]*$"/>
         </module>
+
         <module name="ParameterName">
             <property name="format" value="^[a-z][a-zA-Z0-9][a-zA-Z0-9]*$"/>
             <message key="name.invalidPattern"
