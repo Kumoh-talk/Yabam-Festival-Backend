@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MenuValidator {
 	private final MenuReader menuReader;
-	
+
 	public void validateMenu(Long menuId) {
 		menuReader.getMenuInfo(menuId)
 			.orElseThrow(() -> new ServiceException(ErrorCode.MENU_NOT_FOUND));
