@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.exception.ErrorCode;
 import com.exception.ServiceException;
 
+import domain.pos.member.entity.UserPassport;
 import domain.pos.menu.entity.Menu;
 import domain.pos.menu.entity.MenuInfo;
 import domain.pos.menu.implement.MenuCategoryValidator;
@@ -28,10 +29,10 @@ public class MenuService {
 	private final MenuReader menuReader;
 	private final MenuWriter menuWriter;
 
-	public Menu postMenu(Long storeId, Long userId, Long menuCategoryId, MenuInfo menuInfo) {
-		storeValidator.validateStoreOwner(storeId, userId);
+	public Menu postMenu(Long storeId, UserPassport userPassport, Long menuCategoryId, MenuInfo menuInfo) {
+		storeValidator.validateStoreOwner(userPassport, storeId);
 		menuCategoryValidator.validateMenuCategory(menuCategoryId);
-		return menuWriter.postMenu(storeId, userId, menuCategoryId, menuInfo);
+		return menuWriter.postMenu(storeId, userPassport, menuCategoryId, menuInfo);
 	}
 
 	public MenuInfo getMenuInfo(Long storeId, Long menuId) {
@@ -54,23 +55,22 @@ public class MenuService {
 		return menuReader.getMenuSlice(pageable, lastMenuInfo, menuCategoryId);
 	}
 
-	public MenuInfo patchMenu(Long storeId, Long userId, MenuInfo patchMenuInfo) {
-		storeValidator.validateStoreOwner(storeId, userId);
+	public MenuInfo patchMenu(Long storeId, UserPassport userPassport, MenuInfo patchMenuInfo) {
+		storeValidator.validateStoreOwner(userPassport, storeId);
 		menuValidator.validateMenu(patchMenuInfo.getMenuId());
 		return menuWriter.patchMenu(patchMenuInfo);
-		// TODO : 이미지 URI가 다르다면 이미지 삭제?
 	}
 
-	public MenuInfo patchMenuOrder(Long storeId, Long userId, Long menuCategoryId, Long menuId, int order) {
-		storeValidator.validateStoreOwner(storeId, userId);
+	public MenuInfo patchMenuOrder(Long storeId, UserPassport userPassport, Long menuCategoryId, Long menuId,
+		int patchOrder) {
+		storeValidator.validateStoreOwner(userPassport, storeId);
 		menuValidator.validateMenu(menuId);
-		return menuWriter.patchMenuOrder(storeId, menuCategoryId, menuId, order);
+		return menuWriter.patchMenuOrder(storeId, menuCategoryId, menuId, patchOrder);
 	}
 
-	public void deleteMenu(Long storeId, Long userId, Long menuCategoryId, Long menuId) {
-		storeValidator.validateStoreOwner(storeId, userId);
+	public void deleteMenu(Long storeId, UserPassport userPassport, Long menuCategoryId, Long menuId) {
+		storeValidator.validateStoreOwner(userPassport, storeId);
 		menuValidator.validateMenu(menuId);
 		menuWriter.deleteMenu(storeId, menuCategoryId, menuId);
-		// TODO : 이미지 삭제?
 	}
 }

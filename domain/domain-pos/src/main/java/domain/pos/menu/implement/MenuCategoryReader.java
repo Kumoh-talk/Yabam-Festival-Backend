@@ -1,5 +1,6 @@
 package domain.pos.menu.implement;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -15,5 +16,9 @@ public class MenuCategoryReader {
 
 	public Optional<MenuCategory> getMenuCategory(Long categoryId) {
 		return menuCategoryRepository.getMenuCategory(categoryId);
+	}
+
+	public List<MenuCategory> getMenuCategoryList(Long storeId) {
+		return menuCategoryRepository.getMenuCategoryList(storeId);
 	}
 }

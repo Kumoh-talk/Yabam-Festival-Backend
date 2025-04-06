@@ -40,8 +40,4 @@ public class StoreInfoFixture {
 			STORE_UNIVERSITY_2
 		);
 	}
-
-	public static StoreInfo CUSTOM_STORE_INFO(Long storeId) {
-		return new StoreInfo(storeId, STORE_NAME, STORE_LOCATION, STORE_DESCRIPTION, STORE_IMAGE_URL, STORE_UNIVERSITY);
-	}
 }

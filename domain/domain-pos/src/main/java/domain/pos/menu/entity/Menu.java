@@ -1,19 +1,19 @@
 package domain.pos.menu.entity;
 
-import domain.pos.store.entity.StoreInfo;
+import domain.pos.store.entity.Store;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 public class Menu {
 	private MenuInfo menuInfo;
-	private StoreInfo storeInfo;
+	private Store store;
 	private MenuCategory menuCategory;
 
 	@Builder
-	public Menu(MenuInfo menuInfo, StoreInfo storeInfo, MenuCategory menuCategory) {
+	public Menu(MenuInfo menuInfo, Store store, MenuCategory menuCategory) {
 		this.menuInfo = menuInfo;
-		this.storeInfo = storeInfo;
+		this.store = store;
 		this.menuCategory = menuCategory;
 	}
 }

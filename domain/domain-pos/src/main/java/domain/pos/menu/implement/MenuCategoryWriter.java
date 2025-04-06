@@ -11,7 +11,16 @@ import lombok.RequiredArgsConstructor;
 public class MenuCategoryWriter {
 	private final MenuCategoryRepository menuCategoryRepository;
 
-	public MenuCategory postMenuCategory(String categoryName) {
-		return menuCategoryRepository.postMenuCategory(categoryName);
+	public MenuCategory postMenuCategory(Long storeId, String categoryName) {
+		return menuCategoryRepository.postMenuCategory(storeId, categoryName);
 	}
+
+	public MenuCategory patchMenuCategory(Long categoryId, String categoryName) {
+		return menuCategoryRepository.patchMenuCategory(categoryId, categoryName);
+	}
+
+	public void deleteMenuCategory(Long categoryId) {
+		menuCategoryRepository.deleteMenuCategory(categoryId);
+	}
+
 }
