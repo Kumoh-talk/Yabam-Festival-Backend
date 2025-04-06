@@ -33,6 +33,7 @@ import domain.pos.menu.entity.MenuCategory;
 import domain.pos.menu.entity.MenuInfo;
 import domain.pos.menu.implement.MenuCategoryValidator;
 import domain.pos.menu.implement.MenuReader;
+import domain.pos.menu.implement.MenuValidator;
 import domain.pos.menu.implement.MenuWriter;
 import domain.pos.menu.service.MenuService;
 import domain.pos.store.entity.Store;
@@ -43,6 +44,8 @@ import domain.pos.store.implement.StoreValidator;
 public class MenuServiceTest extends ServiceTest {
 	@Mock
 	private StoreValidator storeValidator;
+	@Mock
+	private MenuValidator menuValidator;
 	@Mock
 	private MenuCategoryValidator menuCategoryValidator;
 	@Mock
@@ -161,7 +164,7 @@ public class MenuServiceTest extends ServiceTest {
 
 	@Nested
 	@DisplayName("메뉴 리스트 조회")
-	class getMenuSlice {
+	class getMenu {
 		private final int size = 10;
 		private final boolean hasNext = false;
 		private final Pageable pageable = Pageable.ofSize(size);
@@ -272,6 +275,64 @@ public class MenuServiceTest extends ServiceTest {
 				verify(menuReader, never())
 					.getMenuSlice(any(Pageable.class), any(MenuInfo.class), any(Long.class));
 			});
+		}
+	}
+
+	@Nested
+	@DisplayName("메뉴 수정")
+	class patchMenu {
+		private final String patchMenuName = "patchMenuName";
+		private final int patchPrice = 20000;
+		private final String patchDescription = "patchDescription";
+		private final String patchImageUrl = "patchImageUrl";
+		private final boolean patchIsSoldOut = false;
+
+		private final Long storeId = 1L;
+		private final Long userId = 2L;
+		private final Long menuId = 3L;
+		private final MenuInfo patchMenuInfo = CUSTOM_MENU_INFO(menuId, patchMenuName, patchPrice, patchDescription,
+			patchImageUrl,
+			patchIsSoldOut);
+
+		private final Long menuCategoryId = 4L;
+		private final int order = 1;
+
+		@Test
+		void 메뉴_수정_성공() {
+			// given
+			BDDMockito.given(menuWriter.patchMenu(patchMenuInfo))
+				.willReturn(patchMenuInfo);
+
+			// when
+			MenuInfo servicePatchMenuInfo = menuService.patchMenu(storeId, userId, patchMenuInfo);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(servicePatchMenuInfo.getMenuName()).isEqualTo(patchMenuInfo.getMenuName());
+				softly.assertThat(servicePatchMenuInfo.getPrice()).isEqualTo(patchMenuInfo.getPrice());
+				softly.assertThat(servicePatchMenuInfo.getDescription()).isEqualTo(patchMenuInfo.getDescription());
+				softly.assertThat(servicePatchMenuInfo.getImageUrl()).isEqualTo(patchMenuInfo.getImageUrl());
+				softly.assertThat(servicePatchMenuInfo.isSoldOut()).isEqualTo(patchMenuInfo.isSoldOut());
+			});
+		}
+	}
+
+	@Nested
+	@DisplayName("메뉴 삭제")
+	class deleteMenu {
+		private final Long storeId = 1L;
+		private final Long userId = 2L;
+		private final Long menuCategoryId = 3L;
+		private final Long menuId = 4L;
+
+		@Test
+		void 메뉴_삭제_성공() {
+			// when
+			menuService.deleteMenu(storeId, userId, menuCategoryId, menuId);
+
+			// then
+			verify(menuWriter)
+				.deleteMenu(storeId, menuCategoryId, menuId);
 		}
 	}
 }
