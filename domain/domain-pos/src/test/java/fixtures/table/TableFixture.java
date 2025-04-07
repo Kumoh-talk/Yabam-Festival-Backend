@@ -23,4 +23,13 @@ public class TableFixture {
 		);
 	}
 
+	public static Table GENERAL_ACTIVE_TABLE(Store store) {
+		return Table.of(
+			GENERAL_TABLE_ID,
+			GENERAL_TABLE_NUMBER,
+			IS_ACTIVE,
+			store
+		);
+	}
+
 }

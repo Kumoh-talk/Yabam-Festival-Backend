@@ -1,9 +1,9 @@
 package fixtures.store;
 
-import static fixtures.member.OwnerFixture.*;
+import static fixtures.member.UserFixture.*;
 import static fixtures.store.StoreInfoFixture.*;
 
-import domain.pos.member.entity.Owner;
+import domain.pos.member.entity.UserPassport;
 import domain.pos.store.entity.Store;
 import domain.pos.store.entity.StoreInfo;
 
@@ -16,7 +16,7 @@ public class StoreFixture {
 	private static final Boolean IS_CLOSED = false;
 
 	// 가게 점주
-	private static final Owner GENERAL_STORE_OWNER = GENERAL_OWNER();
+	private static final UserPassport GENERAL_STORE_OWNER = OWNER_USER_PASSPORT();
 
 	// 가게 정보
 	private static final StoreInfo GENERAL_STORE_INFO = GENERAL_STORE_INFO();
@@ -49,12 +49,12 @@ public class StoreFixture {
 		);
 	}
 
-	public static Store CUSTOM_STORE(Long storeId, StoreInfo storeInfo, Owner owner) {
+	public static Store CUSTOM_STORE(Long storeId, StoreInfo storeInfo, UserPassport ownerPassport) {
 		return new Store(
 			storeId,
 			IS_CLOSED,
 			storeInfo,
-			owner
+			ownerPassport
 		);
 	}
 }
