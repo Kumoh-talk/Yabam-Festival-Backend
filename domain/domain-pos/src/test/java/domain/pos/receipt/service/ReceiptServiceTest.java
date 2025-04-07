@@ -1,6 +1,6 @@
-package domain.pos.order.service;
+package domain.pos.receipt.service;
 
-import static fixtures.order.OrderFixture.*;
+import static fixtures.receipt.ReceiptFixture.*;
 import static fixtures.store.SaleFixture.*;
 import static fixtures.table.TableFixture.*;
 import static org.assertj.core.api.SoftAssertions.*;
@@ -19,8 +19,8 @@ import com.exception.ServiceException;
 
 import base.ServiceTest;
 import domain.pos.member.entity.UserPassport;
-import domain.pos.order.entity.Order;
-import domain.pos.order.implement.OrderWriter;
+import domain.pos.receipt.entity.Receipt;
+import domain.pos.receipt.implement.ReceiptWriter;
 import domain.pos.store.entity.Sale;
 import domain.pos.store.entity.Store;
 import domain.pos.store.implement.SaleReader;
@@ -30,7 +30,7 @@ import domain.pos.table.implement.TableWriter;
 import fixtures.member.UserFixture;
 import fixtures.store.StoreFixture;
 
-class OrderServiceTest extends ServiceTest {
+class ReceiptServiceTest extends ServiceTest {
 
 	@Mock
 	private TableReader tableReader;
@@ -42,14 +42,14 @@ class OrderServiceTest extends ServiceTest {
 	private TableWriter tableWriter;
 
 	@Mock
-	private OrderWriter orderWriter;
+	private ReceiptWriter receiptWriter;
 
 	@InjectMocks
-	private OrderService orderService;
+	private ReceiptService receiptService;
 
 	@Nested
 	@DisplayName("주문 등록")
-	class registerOrder {
+	class registerReceipt {
 		@Test
 		void 성공() {
 			// given
@@ -62,7 +62,7 @@ class OrderServiceTest extends ServiceTest {
 			Long querySaleId = savedSale.getSaleId();
 
 			Table changedActiveTable = GENERAL_ACTIVE_TABLE(savedStore);
-			Order createdOrder = ORDER_NON_ADJUSTMENT(
+			Receipt createdReceipt = RECEIPT_NON_ADJUSTMENT(
 				queryUserPassport,
 				changedActiveTable,
 				savedSale
@@ -73,25 +73,25 @@ class OrderServiceTest extends ServiceTest {
 				.when(saleReader).readSingleSale(querySaleId);
 			doReturn(changedActiveTable)
 				.when(tableWriter).changeTableActiveStatus(true, savedInActiveTable);
-			doReturn(createdOrder)
-				.when(orderWriter).createOrder(queryUserPassport, changedActiveTable, savedSale);
+			doReturn(createdReceipt)
+				.when(receiptWriter).createReceipt(queryUserPassport, changedActiveTable, savedSale);
 			// when
-			Order savedOrder = orderService.registerOrder(
+			Receipt savedReceipt = receiptService.registerReceipt(
 				queryUserPassport,
 				queryTableId,
 				querySaleId
 			);
 			// then
 			assertSoftly(softly -> {
-				softly.assertThat(savedOrder.getTable()).isEqualTo(changedActiveTable);
-				softly.assertThat(savedOrder.getSale()).isEqualTo(savedSale);
-				softly.assertThat(savedOrder.isAdjustment()).isFalse();
-				softly.assertThat(savedOrder.getTable().getIsActive()).isTrue();
+				softly.assertThat(savedReceipt.getTable()).isEqualTo(changedActiveTable);
+				softly.assertThat(savedReceipt.getSale()).isEqualTo(savedSale);
+				softly.assertThat(savedReceipt.isAdjustment()).isFalse();
+				softly.assertThat(savedReceipt.getTable().getIsActive()).isTrue();
 
 				verify(saleReader).readSingleSale(anyLong());
 				verify(tableReader).findLockTableById(anyLong());
 				verify(tableWriter).changeTableActiveStatus(anyBoolean(), any(Table.class));
-				verify(orderWriter).createOrder(any(UserPassport.class), any(Table.class), any(Sale.class));
+				verify(receiptWriter).createReceipt(any(UserPassport.class), any(Table.class), any(Sale.class));
 			});
 
 		}
@@ -115,7 +115,7 @@ class OrderServiceTest extends ServiceTest {
 			// when -> then
 			assertSoftly(softly -> {
 				softly.assertThatThrownBy(
-						() -> orderService.registerOrder(queryUserPassport, queryTableId, querySaleId))
+						() -> receiptService.registerReceipt(queryUserPassport, queryTableId, querySaleId))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.ALREADY_ACTIVE_TABLE);
 
@@ -123,8 +123,8 @@ class OrderServiceTest extends ServiceTest {
 				verify(tableReader).findLockTableById(anyLong());
 				verify(tableWriter, never())
 					.changeTableActiveStatus(anyBoolean(), any(Table.class));
-				verify(orderWriter, never())
-					.createOrder(any(UserPassport.class), any(Table.class), any(Sale.class));
+				verify(receiptWriter, never())
+					.createReceipt(any(UserPassport.class), any(Table.class), any(Sale.class));
 			});
 		}
 
@@ -145,7 +145,7 @@ class OrderServiceTest extends ServiceTest {
 			// when -> then
 			assertSoftly(softly -> {
 				softly.assertThatThrownBy(
-						() -> orderService.registerOrder(queryUserPassport, queryTableId, querySaleId))
+						() -> receiptService.registerReceipt(queryUserPassport, queryTableId, querySaleId))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_SALE);
 
@@ -154,8 +154,8 @@ class OrderServiceTest extends ServiceTest {
 					.findLockTableById(anyLong());
 				verify(tableWriter, never())
 					.changeTableActiveStatus(anyBoolean(), any(Table.class));
-				verify(orderWriter, never())
-					.createOrder(any(UserPassport.class), any(Table.class), any(Sale.class));
+				verify(receiptWriter, never())
+					.createReceipt(any(UserPassport.class), any(Table.class), any(Sale.class));
 			});
 		}
 
@@ -178,7 +178,7 @@ class OrderServiceTest extends ServiceTest {
 			// when -> then
 			assertSoftly(softly -> {
 				softly.assertThatThrownBy(
-						() -> orderService.registerOrder(queryUserPassport, queryTableId, querySaleId))
+						() -> receiptService.registerReceipt(queryUserPassport, queryTableId, querySaleId))
 					.isInstanceOf(ServiceException.class)
 					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_TABLE);
 
@@ -186,8 +186,8 @@ class OrderServiceTest extends ServiceTest {
 				verify(tableReader).findLockTableById(anyLong());
 				verify(tableWriter, never())
 					.changeTableActiveStatus(anyBoolean(), any(Table.class));
-				verify(orderWriter, never())
-					.createOrder(any(UserPassport.class), any(Table.class), any(Sale.class));
+				verify(receiptWriter, never())
+					.createReceipt(any(UserPassport.class), any(Table.class), any(Sale.class));
 			});
 		}
 	}
