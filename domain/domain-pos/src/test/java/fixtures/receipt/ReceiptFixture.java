@@ -1,11 +1,11 @@
-package fixtures.order;
+package fixtures.receipt;
 
 import domain.pos.member.entity.UserPassport;
-import domain.pos.order.entity.Order;
+import domain.pos.receipt.entity.Receipt;
 import domain.pos.store.entity.Sale;
 import domain.pos.table.entity.Table;
 
-public class OrderFixture {
+public class ReceiptFixture {
 	// order 고유 ID
 	public static final Long GENERAL_ORDER_ID = 1L;
 
@@ -13,8 +13,8 @@ public class OrderFixture {
 	private static final boolean ORDER_IS_ADJUSTMENT = true;
 	private static final boolean ORDER_IS_NOT_ADJUSTMENT = false;
 
-	public static Order ORDER_NON_ADJUSTMENT(final UserPassport userPassport, final Table table, final Sale sale) {
-		return Order.of(
+	public static Receipt RECEIPT_NON_ADJUSTMENT(final UserPassport userPassport, final Table table, final Sale sale) {
+		return Receipt.of(
 			GENERAL_ORDER_ID,
 			ORDER_IS_NOT_ADJUSTMENT,
 			userPassport,
@@ -23,8 +23,8 @@ public class OrderFixture {
 		);
 	}
 
-	public static Order ORDER_ADJUSTMENT(final UserPassport userPassport, final Table table, final Sale sale) {
-		return Order.of(
+	public static Receipt RECEIPT_ADJUSTMENT(final UserPassport userPassport, final Table table, final Sale sale) {
+		return Receipt.of(
 			GENERAL_ORDER_ID,
 			ORDER_IS_ADJUSTMENT,
 			userPassport,
