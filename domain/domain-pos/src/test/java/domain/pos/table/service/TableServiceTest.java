@@ -22,7 +22,8 @@ import domain.pos.member.entity.UserPassport;
 import domain.pos.store.entity.Store;
 import domain.pos.store.implement.StoreValidator;
 import domain.pos.table.entity.Table;
-import domain.pos.table.implement.TableHandler;
+import domain.pos.table.implement.TableReader;
+import domain.pos.table.implement.TableWriter;
 
 class TableServiceTest extends ServiceTest {
 
@@ -30,7 +31,10 @@ class TableServiceTest extends ServiceTest {
 	private StoreValidator storeValidator;
 
 	@Mock
-	private TableHandler tableHandler;
+	private TableReader tableReader;
+
+	@Mock
+	private TableWriter tableWriter;
 
 	@InjectMocks
 	private TableService tableService;
@@ -51,9 +55,9 @@ class TableServiceTest extends ServiceTest {
 			doReturn(responStore)
 				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
 			doReturn(Optional.empty())
-				.when(tableHandler).existsTable(responStore, queryTableNumber);
+				.when(tableReader).existsTable(responStore, queryTableNumber);
 			doReturn(createdTable)
-				.when(tableHandler).createTable(responStore, queryTableNumber);
+				.when(tableWriter).createTable(responStore, queryTableNumber);
 			// when
 			Table resultTable = tableService.createTable(queryUserPassport, queryStoreId, queryTableNumber);
 
@@ -65,7 +69,9 @@ class TableServiceTest extends ServiceTest {
 				softly.assertThat(resultTable.getStore().getStoreId()).isEqualTo(responStore.getStoreId());
 
 				verify(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
-				verify(tableHandler).createTable(responStore, queryTableNumber);
+				verify(tableReader)
+					.existsTable(responStore, queryTableNumber);
+				verify(tableWriter).createTable(responStore, queryTableNumber);
 			});
 		}
 
@@ -88,9 +94,9 @@ class TableServiceTest extends ServiceTest {
 
 				verify(storeValidator)
 					.validateStoreOwner(queryUserPassport, queryStoreId);
-				verify(tableHandler, never())
+				verify(tableReader, never())
 					.existsTable(any(Store.class), anyInt());
-				verify(tableHandler, never())
+				verify(tableWriter, never())
 					.createTable(any(Store.class), anyInt());
 			});
 		}
@@ -114,9 +120,9 @@ class TableServiceTest extends ServiceTest {
 
 				verify(storeValidator)
 					.validateStoreOwner(queryUserPassport, queryStoreId);
-				verify(tableHandler, never())
+				verify(tableReader, never())
 					.existsTable(any(Store.class), anyInt());
-				verify(tableHandler, never())
+				verify(tableWriter, never())
 					.createTable(any(Store.class), anyInt());
 			});
 		}
@@ -134,7 +140,7 @@ class TableServiceTest extends ServiceTest {
 			doReturn(responStore)
 				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
 			doReturn(Optional.of(createdTable))
-				.when(tableHandler).existsTable(responStore, queryTableNumber);
+				.when(tableReader).existsTable(responStore, queryTableNumber);
 
 			// when -> then
 			assertSoftly(softly -> {
@@ -145,9 +151,9 @@ class TableServiceTest extends ServiceTest {
 
 				verify(storeValidator)
 					.validateStoreOwner(queryUserPassport, queryStoreId);
-				verify(tableHandler)
+				verify(tableReader)
 					.existsTable(responStore, queryTableNumber);
-				verify(tableHandler, never())
+				verify(tableWriter, never())
 					.createTable(responStore, queryTableNumber);
 			});
 		}

@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
+import domain.pos.store.entity.Store;
 import domain.pos.table.entity.Table;
 import domain.pos.table.repository.TableRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,5 +16,9 @@ public class TableReader {
 
 	public Optional<Table> findLockTableById(Long queryTableId) {
 		return tableRepository.findById(queryTableId);
+	}
+
+	public Optional<Object> existsTable(Store responStore, Integer queryTableNumber) {
+		return tableRepository.findTableByStoreAndTableNum(responStore, queryTableNumber);
 	}
 }
