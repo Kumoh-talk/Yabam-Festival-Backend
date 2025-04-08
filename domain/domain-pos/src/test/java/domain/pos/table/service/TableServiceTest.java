@@ -282,4 +282,36 @@ class TableServiceTest extends ServiceTest {
 			});
 		}
 	}
+
+	@Nested
+	@DisplayName("가게 테이블 활성화 여부 리스트 조회")
+	class findTables {
+		@Test
+		void 성공() {
+			// given
+			Long queryStoreId = GENERAL_OPEN_STORE().getStoreId();
+
+			Store responStore = GENERAL_OPEN_STORE();
+			Table savedTable1 = GENERAL_IN_ACTIVE_TABLE(responStore);
+			Table savedTable2 = GENERAL_ACTIVE_TABLE(responStore);
+			List<Table> savedTables = List.of(
+				savedTable1,
+				savedTable2);
+
+			doReturn(savedTables)
+				.when(tableReader).findTables(queryStoreId);
+
+			// when
+			List<Table> resultTables = tableService.findTables(queryStoreId);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(resultTables).hasSize(2);
+				softly.assertThat(resultTables).contains(savedTable1, savedTable2);
+
+				verify(tableReader)
+					.findTables(anyLong());
+			});
+		}
+	}
 }

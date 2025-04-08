@@ -54,4 +54,9 @@ public class TableService {
 		final List<Table> updatedTable = tableWriter.modifyTableNum(store, queryUpdateTableNumber);
 		return updatedTable;
 	}
+
+	public List<Table> findTables(Long queryStoreId) {
+		return tableReader.findTables(queryStoreId);
+	}
+
 }

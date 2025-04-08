@@ -1,5 +1,6 @@
 package domain.pos.table.implement;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -20,5 +21,9 @@ public class TableReader {
 
 	public boolean isExistsTable(Store responStore, Integer queryTableNumber) {
 		return tableRepository.existsTableByStore(responStore, queryTableNumber);
+	}
+
+	public List<Table> findTables(Long storeId) {
+		return tableRepository.findTablesByStoreId(storeId);
 	}
 }
