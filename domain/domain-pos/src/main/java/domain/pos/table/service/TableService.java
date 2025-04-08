@@ -1,5 +1,7 @@
 package domain.pos.table.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.exception.ErrorCode;
@@ -22,16 +24,20 @@ public class TableService {
 	private final TableReader tableReader;
 	private final TableWriter tableWriter;
 
-	public Table createTable(final UserPassport ownerPassport, final Long queryStoreId,
+	public List<Table> createTable(final UserPassport ownerPassport, final Long queryStoreId,
 		final Integer queryTableNumber) {
 		final Store store = storeValidator.validateStoreOwner(ownerPassport, queryStoreId);
 
-		tableReader.existsTable(store, queryTableNumber)
-			.ifPresent(table -> {
-				log.warn("존재하는 테이블 생성 에러 : storeId={}, tableNumber={}", queryStoreId, queryTableNumber);
-				throw new ServiceException(ErrorCode.EXIST_TABLE);
-			});
-		final Table createdTable = tableWriter.createTable(store, queryTableNumber);
+		if (store.getIsOpen()) {
+			log.warn("가게가 운영중입니다. 테이블 생성 불가 : storeId={}", queryStoreId);
+			throw new ServiceException(ErrorCode.STORE_IS_OPEN_TABLE_CREATE);
+		}
+
+		if (tableReader.isExistsTable(store, queryTableNumber)) {
+			log.warn("존재하는 테이블 생성 에러 : storeId={}, tableNumber={}", queryStoreId, queryTableNumber);
+			throw new ServiceException(ErrorCode.EXIST_TABLE);
+		}
+		final List<Table> createdTable = tableWriter.createTables(store, queryTableNumber);
 		log.info("테이블 생성 성공 : storeId={}, tableNumber={}", queryStoreId, queryTableNumber);
 		return createdTable;
 	}

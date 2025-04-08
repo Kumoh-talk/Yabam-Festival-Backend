@@ -53,7 +53,7 @@ class ReceiptServiceTest extends ServiceTest {
 		@Test
 		void 성공() {
 			// given
-			Store savedStore = StoreFixture.GENERAL_STORE();
+			Store savedStore = StoreFixture.GENERAL_CLOSE_STORE();
 			Table savedInActiveTable = GENERAL_IN_ACTIVE_TABLE(savedStore);
 			Sale savedSale = GENERAL_OPEN_SALE(savedStore);
 
@@ -99,7 +99,7 @@ class ReceiptServiceTest extends ServiceTest {
 		@Test
 		void 실패_테이블이_활성화되어있는데_요청을_보낸_경우() {
 			// given
-			Store savedStore = StoreFixture.GENERAL_STORE();
+			Store savedStore = StoreFixture.GENERAL_CLOSE_STORE();
 			Table savedActiveTable = GENERAL_ACTIVE_TABLE(savedStore);
 			Sale savedSale = GENERAL_OPEN_SALE(savedStore);
 
@@ -131,7 +131,7 @@ class ReceiptServiceTest extends ServiceTest {
 		@Test
 		void 실패_유효하지_않은_sale_id() {
 			// given
-			Store savedStore = StoreFixture.GENERAL_STORE();
+			Store savedStore = StoreFixture.GENERAL_CLOSE_STORE();
 			Table savedActiveTable = GENERAL_ACTIVE_TABLE(savedStore);
 			Sale savedSale = GENERAL_OPEN_SALE(savedStore);
 
@@ -162,7 +162,7 @@ class ReceiptServiceTest extends ServiceTest {
 		@Test
 		void 실패_유효하지_않은_table_id() {
 			// given
-			Store savedStore = StoreFixture.GENERAL_STORE();
+			Store savedStore = StoreFixture.GENERAL_CLOSE_STORE();
 			Table savedActiveTable = GENERAL_ACTIVE_TABLE(savedStore);
 			Sale savedSale = GENERAL_OPEN_SALE(savedStore);
 

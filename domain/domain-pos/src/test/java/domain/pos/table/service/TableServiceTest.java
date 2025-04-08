@@ -6,7 +6,7 @@ import static fixtures.table.TableFixture.*;
 import static org.assertj.core.api.SoftAssertions.*;
 import static org.mockito.Mockito.*;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -42,37 +42,68 @@ class TableServiceTest extends ServiceTest {
 	@Nested
 	@DisplayName("가게 테이블 생성")
 	class createTable {
+		private static final boolean IS_EXISTS_TABLE = true;
+		private static final boolean IS_NOT_EXISTS_TABLE = false;
+
 		@Test
 		void 성공() {
 			// given
 			UserPassport queryUserPassport = OWNER_USER_PASSPORT();
-			Long queryStoreId = GENERAL_STORE().getStoreId();
+			Long queryStoreId = GENERAL_CLOSE_STORE().getStoreId();
 			Integer queryTableNumber = 1;
 
-			Store responStore = GENERAL_STORE();
+			Store responStore = GENERAL_CLOSE_STORE();
 			Table createdTable = GENERAL_IN_ACTIVE_TABLE(responStore);
+			List<Table> createdTables = List.of(createdTable);
 
 			doReturn(responStore)
 				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
-			doReturn(Optional.empty())
-				.when(tableReader).existsTable(responStore, queryTableNumber);
-			doReturn(createdTable)
-				.when(tableWriter).createTable(responStore, queryTableNumber);
+			doReturn(IS_NOT_EXISTS_TABLE)
+				.when(tableReader).isExistsTable(responStore, queryTableNumber);
+			doReturn(createdTables)
+				.when(tableWriter).createTables(responStore, queryTableNumber);
 			// when
-			Table resultTable = tableService.createTable(queryUserPassport, queryStoreId, queryTableNumber);
+			List<Table> resultTable = tableService.createTable(queryUserPassport, queryStoreId, queryTableNumber);
 
 			// then
 			assertSoftly(softly -> {
-				softly.assertThat(resultTable.getTableId()).isEqualTo(createdTable.getTableId());
-				softly.assertThat(resultTable.getTableNumber()).isEqualTo(createdTable.getTableNumber());
-				softly.assertThat(resultTable.getStore().getStoreId()).isEqualTo(responStore.getStoreId());
-				softly.assertThat(resultTable.getStore().getStoreId()).isEqualTo(responStore.getStoreId());
+				softly.assertThat(resultTable).hasSize(queryTableNumber);
 
 				verify(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
 				verify(tableReader)
-					.existsTable(responStore, queryTableNumber);
-				verify(tableWriter).createTable(responStore, queryTableNumber);
+					.isExistsTable(responStore, queryTableNumber);
+				verify(tableWriter).createTables(responStore, queryTableNumber);
 			});
+		}
+
+		@Test
+		void 실패_운영중인_가게에서_테이블_생성불가() {
+			// given
+			UserPassport queryUserPassport = OWNER_USER_PASSPORT();
+			Long queryStoreId = GENERAL_OPEN_STORE().getStoreId();
+			Integer queryTableNumber = 1;
+
+			Store responStore = GENERAL_OPEN_STORE();
+
+			doReturn(responStore)
+				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
+
+			// when -> then
+			assertSoftly(
+				softly -> {
+					softly.assertThatThrownBy(
+							() -> tableService.createTable(queryUserPassport, queryStoreId, queryTableNumber))
+						.isInstanceOf(ServiceException.class)
+						.hasFieldOrPropertyWithValue("errorCode", ErrorCode.STORE_IS_OPEN_TABLE_CREATE);
+
+					verify(storeValidator)
+						.validateStoreOwner(any(UserPassport.class), anyLong());
+					verify(tableReader, never())
+						.isExistsTable(any(Store.class), anyInt());
+					verify(tableWriter, never())
+						.createTables(any(Store.class), anyInt());
+				}
+			);
 		}
 
 		@Test
@@ -95,9 +126,9 @@ class TableServiceTest extends ServiceTest {
 				verify(storeValidator)
 					.validateStoreOwner(queryUserPassport, queryStoreId);
 				verify(tableReader, never())
-					.existsTable(any(Store.class), anyInt());
+					.isExistsTable(any(Store.class), anyInt());
 				verify(tableWriter, never())
-					.createTable(any(Store.class), anyInt());
+					.createTables(any(Store.class), anyInt());
 			});
 		}
 
@@ -105,7 +136,7 @@ class TableServiceTest extends ServiceTest {
 		void 실패_점주_주인과_요청유저가_불일치() {
 			// given
 			UserPassport queryUserPassport = OWNER_USER_PASSPORT();
-			Long queryStoreId = GENERAL_STORE().getStoreId();
+			Long queryStoreId = GENERAL_CLOSE_STORE().getStoreId();
 			Integer queryTableNumber = 1;
 
 			doThrow(new ServiceException(ErrorCode.NOT_EQUAL_STORE_OWNER))
@@ -121,9 +152,9 @@ class TableServiceTest extends ServiceTest {
 				verify(storeValidator)
 					.validateStoreOwner(queryUserPassport, queryStoreId);
 				verify(tableReader, never())
-					.existsTable(any(Store.class), anyInt());
+					.isExistsTable(any(Store.class), anyInt());
 				verify(tableWriter, never())
-					.createTable(any(Store.class), anyInt());
+					.createTables(any(Store.class), anyInt());
 			});
 		}
 
@@ -131,16 +162,16 @@ class TableServiceTest extends ServiceTest {
 		void 실패_존재하는_테이블() {
 			// given
 			UserPassport queryUserPassport = OWNER_USER_PASSPORT();
-			Long queryStoreId = GENERAL_STORE().getStoreId();
-			Integer queryTableNumber = GENERAL_IN_ACTIVE_TABLE(GENERAL_STORE()).getTableNumber();
+			Long queryStoreId = GENERAL_CLOSE_STORE().getStoreId();
+			Integer queryTableNumber = GENERAL_IN_ACTIVE_TABLE(GENERAL_CLOSE_STORE()).getTableNumber();
 
-			Store responStore = GENERAL_STORE();
+			Store responStore = GENERAL_CLOSE_STORE();
 			Table createdTable = GENERAL_IN_ACTIVE_TABLE(responStore);
 
 			doReturn(responStore)
 				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
-			doReturn(Optional.of(createdTable))
-				.when(tableReader).existsTable(responStore, queryTableNumber);
+			doReturn(IS_EXISTS_TABLE)
+				.when(tableReader).isExistsTable(responStore, queryTableNumber);
 
 			// when -> then
 			assertSoftly(softly -> {
@@ -152,9 +183,9 @@ class TableServiceTest extends ServiceTest {
 				verify(storeValidator)
 					.validateStoreOwner(queryUserPassport, queryStoreId);
 				verify(tableReader)
-					.existsTable(responStore, queryTableNumber);
+					.isExistsTable(responStore, queryTableNumber);
 				verify(tableWriter, never())
-					.createTable(responStore, queryTableNumber);
+					.createTables(responStore, queryTableNumber);
 			});
 		}
 	}

@@ -18,7 +18,7 @@ public class TableReader {
 		return tableRepository.findById(queryTableId);
 	}
 
-	public Optional<Object> existsTable(Store responStore, Integer queryTableNumber) {
-		return tableRepository.findTableByStoreAndTableNum(responStore, queryTableNumber);
+	public boolean isExistsTable(Store responStore, Integer queryTableNumber) {
+		return tableRepository.existsTableByStore(responStore, queryTableNumber);
 	}
 }

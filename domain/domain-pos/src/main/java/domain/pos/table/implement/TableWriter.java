@@ -1,5 +1,7 @@
 package domain.pos.table.implement;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import domain.pos.store.entity.Store;
@@ -17,7 +19,7 @@ public class TableWriter {
 		return changeActiveTable;
 	}
 
-	public Table createTable(Store responStore, Integer queryTableNumber) {
-		return tableRepository.createTable(responStore, queryTableNumber);
+	public List<Table> createTables(Store responStore, Integer queryTableNumber) {
+		return tableRepository.createTablesAll(responStore, queryTableNumber);
 	}
 }

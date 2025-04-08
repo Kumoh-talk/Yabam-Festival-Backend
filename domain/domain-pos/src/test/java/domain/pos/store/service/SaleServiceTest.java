@@ -49,7 +49,7 @@ class SaleServiceTest extends ServiceTest {
 		void 성공() {
 			// given
 			UserPassport queryUserPassport = OWNER_USER_PASSPORT();
-			Store savedStore = GENERAL_STORE();
+			Store savedStore = GENERAL_CLOSE_STORE();
 			Store opendStore = GENERAL_OPEN_STORE();
 			Long queryStoreId = savedStore.getStoreId();
 			Sale createdSale = GENERAL_OPEN_SALE(opendStore);
@@ -159,7 +159,7 @@ class SaleServiceTest extends ServiceTest {
 			Sale savedOpenedSale = GENERAL_OPEN_SALE(savedStore);
 			Long querySaleId = savedOpenedSale.getSaleId();
 
-			Store closedStore = GENERAL_STORE();
+			Store closedStore = GENERAL_CLOSE_STORE();
 			Sale closedSale = GENERAL_CLOSE_SALE(closedStore);
 
 			doReturn(Optional.of(savedOpenedSale))
@@ -214,7 +214,7 @@ class SaleServiceTest extends ServiceTest {
 		void 실패_이미_종료된_SALE() {
 			// given
 			UserPassport queryUserPassport = OWNER_USER_PASSPORT();
-			Sale savedClosedSale = GENERAL_CLOSE_SALE(GENERAL_STORE());
+			Sale savedClosedSale = GENERAL_CLOSE_SALE(GENERAL_CLOSE_STORE());
 
 			doReturn(Optional.of(savedClosedSale))
 				.when(saleReader).readSingleSale(savedClosedSale.getSaleId());
@@ -237,7 +237,7 @@ class SaleServiceTest extends ServiceTest {
 		void 실패_이미_종료된_가게_상태() {
 			// given
 			UserPassport queryUserPassport = OWNER_USER_PASSPORT();
-			Store savedStore = GENERAL_CLOSE_SALE(GENERAL_STORE()).getStore();
+			Store savedStore = GENERAL_CLOSE_SALE(GENERAL_CLOSE_STORE()).getStore();
 			Sale savedOpenedSale = GENERAL_OPEN_SALE(savedStore);
 			Long querySaleId = savedOpenedSale.getSaleId();
 			doReturn(Optional.of(savedOpenedSale))
