@@ -22,4 +22,8 @@ public class TableWriter {
 	public List<Table> createTables(Store responStore, Integer queryTableNumber) {
 		return tableRepository.createTablesAll(responStore, queryTableNumber);
 	}
+
+	public List<Table> modifyTableNum(Store store, Integer queryUpdateTableNumber) {
+		return tableRepository.updateTableNum(store, queryUpdateTableNumber);
+	}
 }

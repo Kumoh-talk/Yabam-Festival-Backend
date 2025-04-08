@@ -94,7 +94,7 @@ class TableServiceTest extends ServiceTest {
 					softly.assertThatThrownBy(
 							() -> tableService.createTable(queryUserPassport, queryStoreId, queryTableNumber))
 						.isInstanceOf(ServiceException.class)
-						.hasFieldOrPropertyWithValue("errorCode", ErrorCode.STORE_IS_OPEN_TABLE_CREATE);
+						.hasFieldOrPropertyWithValue("errorCode", ErrorCode.STORE_IS_OPEN_TABLE_WRITE);
 
 					verify(storeValidator)
 						.validateStoreOwner(any(UserPassport.class), anyLong());
@@ -186,6 +186,99 @@ class TableServiceTest extends ServiceTest {
 					.isExistsTable(responStore, queryTableNumber);
 				verify(tableWriter, never())
 					.createTables(responStore, queryTableNumber);
+			});
+		}
+	}
+
+	@Nested
+	@DisplayName("가게 테이블 수 조정")
+	class updateTable {
+		private static final boolean IS_EXISTS_TABLE = true;
+		private static final boolean IS_NOT_EXISTS_TABLE = false;
+
+		@Test
+		void 성공() {
+			// given
+			UserPassport queryUserPassport = OWNER_USER_PASSPORT();
+			Long queryStoreId = GENERAL_CLOSE_STORE().getStoreId();
+			Integer queryUpdateTableNumber = 2;
+
+			Store responStore = GENERAL_CLOSE_STORE();
+			Table createTable1 = GENERAL_IN_ACTIVE_TABLE(responStore);
+			Table createTable2 = GENERAL_IN_ACTIVE_TABLE(responStore);
+			List<Table> createdTables = List.of(
+				createTable1,
+				createTable2);
+
+			doReturn(responStore)
+				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
+			doReturn(createdTables)
+				.when(tableWriter).modifyTableNum(responStore, queryUpdateTableNumber);
+
+			// when
+			List<Table> resultTables = tableService.updateTableNum(queryUserPassport, queryStoreId,
+				queryUpdateTableNumber);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(resultTables).hasSize(queryUpdateTableNumber);
+				softly.assertThat(resultTables).contains(createTable1, createTable2);
+
+				verify(storeValidator)
+					.validateStoreOwner(any(UserPassport.class), anyLong());
+				verify(tableWriter)
+					.modifyTableNum(any(Store.class), anyInt());
+
+			});
+		}
+
+		@Test
+		void 실패_운영중인_가게에서_테이블_수_조정불가() {
+			// given
+			UserPassport queryUserPassport = OWNER_USER_PASSPORT();
+			Long queryStoreId = GENERAL_OPEN_STORE().getStoreId();
+			Integer queryUpdateTableNumber = 2;
+
+			Store responStore = GENERAL_OPEN_STORE();
+
+			doReturn(responStore)
+				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(
+						() -> tableService.updateTableNum(queryUserPassport, queryStoreId, queryUpdateTableNumber))
+					.isInstanceOf(ServiceException.class)
+					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.STORE_IS_OPEN_TABLE_WRITE);
+
+				verify(storeValidator)
+					.validateStoreOwner(any(UserPassport.class), anyLong());
+				verify(tableWriter, never())
+					.modifyTableNum(any(Store.class), anyInt());
+			});
+		}
+
+		@Test
+		void 실패_점주가_아닌_사용자() {
+			// given
+			UserPassport queryUserPassport = OWNER_USER_PASSPORT();
+			Long queryStoreId = 0L;
+			Integer queryUpdateTableNumber = 2;
+
+			doThrow(new ServiceException(ErrorCode.NOT_EQUAL_STORE_OWNER))
+				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(
+						() -> tableService.updateTableNum(queryUserPassport, queryStoreId, queryUpdateTableNumber))
+					.isInstanceOf(ServiceException.class)
+					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_EQUAL_STORE_OWNER);
+
+				verify(storeValidator)
+					.validateStoreOwner(queryUserPassport, queryStoreId);
+				verify(tableWriter, never())
+					.modifyTableNum(any(Store.class), anyInt());
 			});
 		}
 	}
