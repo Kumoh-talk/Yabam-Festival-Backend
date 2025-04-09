@@ -22,7 +22,7 @@ public class StoreFixture {
 	private static final StoreInfo GENERAL_STORE_INFO = GENERAL_STORE_INFO();
 	private static final StoreInfo GENERAL_CHANGED_STORE_INFO = CHANGED_GENERAL_STORE_INFO();
 
-	public static Store GENERAL_STORE() {
+	public static Store GENERAL_CLOSE_STORE() {
 		return new Store(
 			STORE_ID,
 			IS_CLOSED,

@@ -72,8 +72,8 @@ class StoreServiceTest extends ServiceTest {
 		@Test
 		void 성공() {
 			// given
-			Long queryStoreId = GENERAL_STORE().getStoreId();
-			Store responseStore = GENERAL_STORE();
+			Long queryStoreId = GENERAL_CLOSE_STORE().getStoreId();
+			Store responseStore = GENERAL_CLOSE_STORE();
 
 			doReturn(Optional.of(responseStore))
 				.when(storeReader).readSingleStore(queryStoreId);
@@ -93,7 +93,7 @@ class StoreServiceTest extends ServiceTest {
 		@Test
 		void 실패_유효하지_않은_가게_ID() {
 			// given
-			Long queryStoreId = GENERAL_STORE().getStoreId();
+			Long queryStoreId = GENERAL_CLOSE_STORE().getStoreId();
 
 			doReturn(Optional.empty())
 				.when(storeReader).readSingleStore(queryStoreId);
@@ -117,8 +117,8 @@ class StoreServiceTest extends ServiceTest {
 		void 성공() {
 			// given
 			UserPassport queryUserPassport = OWNER_USER_PASSPORT();
-			Long queryStoreId = GENERAL_STORE().getStoreId();
-			Store nonChangedStore = GENERAL_STORE();
+			Long queryStoreId = GENERAL_CLOSE_STORE().getStoreId();
+			Store nonChangedStore = GENERAL_CLOSE_STORE();
 			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
 			Store changedStore = CHANGED_GENERAL_STORE();
 
@@ -146,7 +146,7 @@ class StoreServiceTest extends ServiceTest {
 		void 실패_수정_요청자가_가게_OWNER와_다를시() {
 			// given
 			UserPassport diffOwnerUserPassport = DIFF_OWNER_PASSPORT();
-			Store previousStore = GENERAL_STORE();
+			Store previousStore = GENERAL_CLOSE_STORE();
 			Long queryStoreId = previousStore.getStoreId();
 			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
 
@@ -173,7 +173,7 @@ class StoreServiceTest extends ServiceTest {
 		void 실패_유효하지_않는_가게_ID() {
 			// given
 			UserPassport queryOwnerPassport = OWNER_USER_PASSPORT();
-			Long queryStoreId = GENERAL_STORE().getStoreId();
+			Long queryStoreId = GENERAL_CLOSE_STORE().getStoreId();
 			StoreInfo requestChangeStoreInfo = CHANGED_GENERAL_STORE().getStoreInfo();
 
 			doThrow(new ServiceException(ErrorCode.NOT_FOUND_STORE))
@@ -204,8 +204,8 @@ class StoreServiceTest extends ServiceTest {
 		void 성공() {
 			// given
 			UserPassport queryUserPassport = OWNER_USER_PASSPORT();
-			Long queryStoreId = GENERAL_STORE().getStoreId();
-			Store savedStore = GENERAL_STORE();
+			Long queryStoreId = GENERAL_CLOSE_STORE().getStoreId();
+			Store savedStore = GENERAL_CLOSE_STORE();
 
 			doReturn(savedStore)
 				.when(storeValidator).validateStoreOwner(queryUserPassport, queryStoreId);
@@ -226,7 +226,7 @@ class StoreServiceTest extends ServiceTest {
 		void 실패_유효하지_않는_가게_ID() {
 			// given
 			UserPassport queryOwnerPassport = OWNER_USER_PASSPORT();
-			Long queryStoreId = GENERAL_STORE().getStoreId();
+			Long queryStoreId = GENERAL_CLOSE_STORE().getStoreId();
 
 			doThrow(new ServiceException(ErrorCode.NOT_FOUND_STORE))
 				.when(storeValidator).validateStoreOwner(queryOwnerPassport, queryStoreId);
@@ -248,7 +248,7 @@ class StoreServiceTest extends ServiceTest {
 		void 실패_가게ID와_점주ID가_다를시() {
 			// given
 			UserPassport queryDiffOwnerPassport = DIFF_OWNER_PASSPORT();
-			Long queryStoreId = GENERAL_STORE().getStoreId();
+			Long queryStoreId = GENERAL_CLOSE_STORE().getStoreId();
 
 			doThrow(new ServiceException(ErrorCode.NOT_EQUAL_STORE_OWNER))
 				.when(storeValidator).validateStoreOwner(queryDiffOwnerPassport, queryStoreId);
