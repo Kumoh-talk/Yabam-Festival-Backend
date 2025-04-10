@@ -9,7 +9,9 @@ import com.exception.ErrorCode;
 import com.exception.ServiceException;
 
 import domain.pos.member.entity.UserPassport;
+import domain.pos.member.entity.UserRole;
 import domain.pos.receipt.entity.Receipt;
+import domain.pos.receipt.entity.ReceiptInfo;
 import domain.pos.receipt.implement.ReceiptReader;
 import domain.pos.receipt.implement.ReceiptWriter;
 import domain.pos.store.entity.Sale;
@@ -53,6 +55,31 @@ public class ReceiptService {
 		final Table changedActiveTable = tableWriter.changeTableActiveStatus(true, savedTable);
 		final Receipt createdReceipt = receiptWriter.createReceipt(queryUserPassport, changedActiveTable, savedSale);
 		return createdReceipt;
+	}
+
+	public ReceiptInfo getReceiptInfo(Long receiptId, UserPassport userPassport) {
+		Receipt receipt = receiptReader.getReceiptWithCustomerAndOwner(receiptId)
+			.orElseThrow(() -> {
+				log.warn("Receipt 을 찾을 수 없습니다. receiptId: {}", receiptId);
+				return new ServiceException(ErrorCode.RECEIPT_NOT_FOUND);
+			});
+
+		if (!hasAccessToReceipt(receipt, userPassport)) {
+			log.warn("Receipt 접근 가능 요청자가 아닙니다. userId: {}", userPassport.getUserId());
+			throw new ServiceException(ErrorCode.RECEIPT_ACCESS_DENIED);
+		}
+
+		return receipt.getReceiptInfo();
+	}
+
+	private boolean hasAccessToReceipt(Receipt receipt, UserPassport userPassport) {
+		Long customerId = receipt.getUserPassport().getUserId();
+		Long storeOwnerId = receipt.getSale().getStore().getOwnerPassport().getUserId();
+		Long userId = userPassport.getUserId();
+
+		return (customerId.equals(userId) && userPassport.getUserRole().equals(UserRole.ROLE_USER))
+			||
+			(storeOwnerId.equals(userId) && userPassport.getUserRole().equals(UserRole.ROLE_OWNER));
 	}
 
 	// TODO : application 계층 one-indexed-parameters 설정 추가

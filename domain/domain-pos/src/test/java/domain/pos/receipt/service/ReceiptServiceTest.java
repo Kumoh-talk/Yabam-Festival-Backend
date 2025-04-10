@@ -23,6 +23,7 @@ import com.exception.ServiceException;
 
 import base.ServiceTest;
 import domain.pos.member.entity.UserPassport;
+import domain.pos.member.entity.UserRole;
 import domain.pos.receipt.entity.Receipt;
 import domain.pos.receipt.entity.ReceiptInfo;
 import domain.pos.receipt.implement.ReceiptReader;
@@ -199,6 +200,88 @@ class ReceiptServiceTest extends ServiceTest {
 					.createReceipt(any(UserPassport.class), any(Table.class), any(Sale.class));
 			});
 		}
+	}
+
+	@Nested
+	@DisplayName("영수증 상세 조회")
+	class getReceiptInfo {
+		private final Long receiptId = 1L;
+		private UserPassport userPassport = CUSTOM_USER_PASSPORT(
+			2L,
+			"요청 유저",
+			UserRole.ROLE_USER
+		);
+
+		@Test
+		void 영수증_상세_조회_성공() {
+			// given
+			Receipt receipt = CUSTOM_RECEIPT(
+				NON_ADJUSTMENT_RECEIPT_INFO(),
+				userPassport,
+				GENERAL_ACTIVE_TABLE(StoreFixture.GENERAL_OPEN_STORE()),
+				GENERAL_OPEN_SALE(StoreFixture.GENERAL_OPEN_STORE())
+			);
+
+			BDDMockito.given(receiptReader.getReceiptWithCustomerAndOwner(receiptId))
+				.willReturn(Optional.of(receipt));
+
+			// when
+			ReceiptInfo receiptInfo = receiptService.getReceiptInfo(receiptId, userPassport);
+
+			// then
+			assertSoftly(softly -> {
+				softly.assertThat(receiptInfo).isEqualTo(receipt.getReceiptInfo());
+			});
+
+		}
+
+		@Test
+		void 영수증_조회_실패() {
+			// given
+			BDDMockito.given(receiptReader.getReceiptWithCustomerAndOwner(receiptId))
+				.willReturn(Optional.empty());
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(
+						() -> receiptService.getReceiptInfo(receiptId, userPassport))
+					.isInstanceOf(ServiceException.class)
+					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.RECEIPT_NOT_FOUND);
+
+				verify(receiptReader).getReceiptWithCustomerAndOwner(receiptId);
+			});
+		}
+
+		@Test
+		void 영수증_접근_권한_실패() {
+			// given
+			UserPassport anotherUserPassport = UserFixture.CUSTOM_USER_PASSPORT(
+				100L,
+				"다른유저",
+				UserRole.ROLE_USER
+			);
+
+			Receipt receipt = CUSTOM_RECEIPT(
+				NON_ADJUSTMENT_RECEIPT_INFO(),
+				userPassport,
+				GENERAL_ACTIVE_TABLE(StoreFixture.GENERAL_OPEN_STORE()),
+				GENERAL_OPEN_SALE(StoreFixture.GENERAL_OPEN_STORE())
+			);
+
+			BDDMockito.given(receiptReader.getReceiptWithCustomerAndOwner(receiptId))
+				.willReturn(Optional.of(receipt));
+
+			// when -> then
+			assertSoftly(softly -> {
+				softly.assertThatThrownBy(
+						() -> receiptService.getReceiptInfo(receiptId, anotherUserPassport))
+					.isInstanceOf(ServiceException.class)
+					.hasFieldOrPropertyWithValue("errorCode", ErrorCode.RECEIPT_ACCESS_DENIED);
+
+				verify(receiptReader).getReceiptWithCustomerAndOwner(receiptId);
+			});
+		}
+
 	}
 
 	@Nested
