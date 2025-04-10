@@ -13,7 +13,7 @@ import fixtures.table.TableFixture;
 
 public class ReceiptFixture {
 	// Store
-	private static Store GENERAL_STORE = StoreFixture.GENERAL_STORE();
+	private static Store GENERAL_STORE = StoreFixture.GENERAL_OPEN_STORE();
 
 	// ReceiptInfo
 	public static ReceiptInfo GENERAL_ADJUSTMENT_RECEIPT_INFO = ReceiptInfoFixture.ADJUSTMENT_RECEIPT_INFO();

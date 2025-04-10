@@ -212,7 +212,7 @@ class ReceiptServiceTest extends ServiceTest {
 		@Test
 		void 영수증_목록_조회_성공() {
 			// given
-			Store savedStore = StoreFixture.GENERAL_STORE();
+			Store savedStore = StoreFixture.GENERAL_OPEN_STORE();
 			Sale savedSale = GENERAL_OPEN_SALE(savedStore);
 
 			BDDMockito.given(saleReader.readSaleWithOwner(saleId))
@@ -229,7 +229,7 @@ class ReceiptServiceTest extends ServiceTest {
 		@Test
 		void 실패_유효하지_않은_sale_id() {
 			// given
-			Sale savedSale = GENERAL_OPEN_SALE(StoreFixture.GENERAL_STORE());
+			Sale savedSale = GENERAL_OPEN_SALE(StoreFixture.GENERAL_OPEN_STORE());
 
 			BDDMockito.given(saleReader.readSaleWithOwner(saleId))
 				.willReturn(Optional.empty());
@@ -250,7 +250,7 @@ class ReceiptServiceTest extends ServiceTest {
 		void 실패_요청_유저_점주_불일치() {
 			// given
 			userPassport = DIFF_OWNER_PASSPORT();
-			Store savedStore = StoreFixture.GENERAL_STORE();
+			Store savedStore = StoreFixture.GENERAL_OPEN_STORE();
 			Sale savedSale = GENERAL_OPEN_SALE(savedStore);
 
 			BDDMockito.given(saleReader.readSaleWithOwner(saleId))
