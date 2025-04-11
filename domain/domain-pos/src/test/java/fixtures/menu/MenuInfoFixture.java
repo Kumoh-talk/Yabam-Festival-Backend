@@ -37,11 +37,11 @@ public class MenuInfoFixture {
 			.build();
 	}
 
-	public static MenuInfo CUSTOM_MENU_INFO(Long menuId, int sortOrder, String menuName, int price, String description,
+	public static MenuInfo CUSTOM_MENU_INFO(Long menuId, int menuOrder, String menuName, int price, String description,
 		String imageUrl, boolean isSoldOut, boolean isRecommended) {
 		return MenuInfo.builder()
 			.menuId(menuId)
-			.menuOrder(sortOrder)
+			.menuOrder(menuOrder)
 			.menuName(menuName)
 			.price(price)
 			.description(description)

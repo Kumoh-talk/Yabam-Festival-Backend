@@ -13,6 +13,7 @@ public class MenuInfo {
 	private String imageUrl;
 	private boolean isSoldOut;
 	private boolean isRecommended;
+	// TODO : 인프라 단에서 menuCategoryId와 menuOrder 복합 Unique 제약조건으로 설정
 
 	@Builder
 	public MenuInfo(Long menuId, int menuOrder, String menuName, int price, String description, String imageUrl,
